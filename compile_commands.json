@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/build",
+  "command": "/usr/bin/c++  -I/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/src -g -std=gnu++17 -o CMakeFiles/Minesweeper.dir/main.cpp.o -c /home/fildo7525/Desktop/Cpp/GUI/Minesweeper/main.cpp",
+  "file": "/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/main.cpp"
+},
+{
+  "directory": "/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/build/src",
+  "command": "/usr/bin/c++  -I/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/src -g -std=gnu++17 -o CMakeFiles/lib.dir/Minesweeper.cpp.o -c /home/fildo7525/Desktop/Cpp/GUI/Minesweeper/src/Minesweeper.cpp",
+  "file": "/home/fildo7525/Desktop/Cpp/GUI/Minesweeper/src/Minesweeper.cpp"
+}
+]
