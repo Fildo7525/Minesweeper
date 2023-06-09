@@ -1,5 +1,5 @@
 #include "Board.h"
-#include "Player.h"
+#include "Icon.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 
@@ -9,89 +9,119 @@
 #include <numeric>
 #include <iostream>
 #include <sstream>
+#include <random>
 
-Board::Board(int boardSize)
-	: Layer("Board")
-	, m_gameOver(false)
-	, m_boardSize(boardSize)
+bool operator==(const Pose &lhs, const Pose &rhs)
 {
-	std::shared_ptr<Player> playerOne(new Player(1,
-											  "User",
-											  Player::Ocupant::White,
-											  "../images/White.png", 80, 80));
-	std::shared_ptr<Player> playerTwo(new Player(2,
-											  "PC",
-											  Player::Ocupant::Black,
-											  "../images/Black.png", 80, 80));
-	m_players.push_back(playerOne);
-	m_players.push_back(playerTwo);
-	m_currentPlayer = m_players.front();
+	return rhs.x == lhs.x && rhs.y == lhs.y;
+}
 
-	initTiles();
+Board::Board(int width, int height, int numberOfMines)
+	: Layer("Board")
+	, m_initialized(false)
+	, m_icons()
+	, m_minePositions(numberOfMines)
+	, m_gameOver(false)
+	, m_width(width)
+	, m_height(height)
+	, m_numberOfMines(numberOfMines)
+{
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::One, "../images/one.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Two, "../images/two.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Three, "../images/three.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Four, "../images/four.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Five, "../images/five.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Six, "../images/six.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Seven, "../images/seven.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Eight, "../images/eight.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Mine, "../images/mine_icon.png", 10, 10));
+	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Flag, "../images/mine_flag.png", 10, 10));
+
+	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
+
+	m_tiles.clear();
+	m_tiles.resize(m_height);
+	for (int y = 0; y < m_height; y++) {
+		std::vector<Tile> row;
+		for (size_t x = 0; x < m_width; x++) {
+			int cnt = countSurroundingMines(x, y);
+			row.emplace_back(Tile(m_icons[0], green));
+		}
+		m_tiles[y] = row;
+	}
+}
+
+void SelectableColor(ImU32 color)
+{
+	ImVec2 p_min = ImGui::GetItemRectMin();
+	ImVec2 p_max = ImGui::GetItemRectMax();
+	ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, color);
 }
 
 void Board::render()
 {
 	if (m_gameOver) {
-		static ImGuiWindowFlags windowFlags = m_windowFlags;
-		// windowFlags ^= ImGuiWindowFlags_NoMove;
-		ImGui::Begin("Game Over", NULL, windowFlags);
-
-		int user = scores().front();
-		int pc = scores().back();
-
-		auto winner = user > pc ? m_players.front() : m_players.back();
-		auto winnerScore = user > pc ? user : pc;
-		auto loser = user > pc ? m_players.back() : m_players.front();
-		auto loserScore = user > pc ? pc : user;
-
-		std::stringstream ss;
-		ss << "Game Over the winner is " << winner->name() << " with " << winnerScore << " points.\n"
-		   << "The loser is " << loser->name() << " with " << loserScore << " points.";
-		ImGui::Text("%s", ss.str().c_str());
-
-		if (ImGui::Button("Play again")) {
+		ImGui::Begin("Game Over", NULL, m_windowFlags);
+		ImGui::Text("Game Over");
+		if (ImGui::Button("Play Again")) {
 			m_gameOver = false;
-			std::for_each(m_players.begin(), m_players.end(), [](std::shared_ptr<Player> &player) {
-				player->resetScore();
-			});
-			initTiles();
-		}
+			m_initialized = false;
+			for (auto &row : m_tiles) {
+				for (auto &tile : row) {
+					tile.click(false);
+				}
+			}
 
+		}
 		ImGui::End();
 	}
 
+	int buttonWidth = (ImGui::GetWindowSize().x) / m_width - 1;
+	int buttonHeight = (ImGui::GetWindowSize().y) / m_height - 1;
+
 	ImGui::Begin("Board", NULL, m_windowFlags);
 
-	int buttonSize = (ImGui::GetWindowSize().x - 35) / m_boardSize - 1;
-
-	for (int y = 0; y < m_boardSize; y++) {
-		for (int x = 0; x < m_tiles.front().size(); x++) {
+	for (int y = 0; y < m_height; y++) {
+		for (int x = 0; x < m_width; x++) {
 			if (x > 0) {
-				ImGui::SameLine(x*(buttonSize+4) + 8);
+				ImGui::SameLine(x*(buttonWidth + 4) + 8);
 			}
-			int id = y * m_boardSize + x;
+			int id = y * m_tiles.front().size() + x;
 			ImGui::PushID(id);
 
 			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)m_tiles[y][x].color());
-			if (m_tiles[y][x].selected() || middleTilePlayer(y, x) != Player::Ocupant::Empty) {
+			if (m_tiles[y][x].clicked()) {
 				setButtonColor(x, y);
 				int h = m_tiles[y][x].ocupant()->textureHeight();
 				int w = m_tiles[y][x].ocupant()->textureWidth();
-				ImGui::ImageButton((void *)(intptr_t)m_tiles[y][x].ocupant()->texture(), ImVec2(buttonSize-8, buttonSize-6));
+				if (ImGui::ImageButton((void *)(intptr_t)m_tiles[y][x].ocupant()->texture(), ImVec2(buttonWidth - 8, buttonHeight - 6))) {
+					if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+						unmarkMine(x, y);
+					}
+				}
 				ImGui::PopStyleColor(2);
 			}
 			else {
 				setButtonColor(x, y);
-				if (ImGui::Button("", ImVec2(buttonSize, buttonSize))) {
+				if (ImGui::Button("", ImVec2(buttonWidth, buttonHeight), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight )) {
 					if (isTilePlayable(x, y)) {
-						m_tiles[y][x].setOcupant(m_currentPlayer);
-						changeOponentTiles(x, y);
-						for(auto &player : m_players) {
-							player->setScore(getPlayerScore(player));
+						if (!m_initialized) {
+							initTiles(x, y);
 						}
-						m_currentPlayer = m_currentPlayer == m_players.front() ? m_players.back() : m_players.front();
-						findBestTileCapture();
+
+						if (ImGui::IsMouseDown(ImGuiMouseButton_Right)
+							|| ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+							markMine(x, y);
+						}
+						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
+							m_gameOver = true;
+							setAllTilesClicked();
+						}
+						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Empty) {
+							clickAllEmptyTiles(x, y);
+						}
+						m_tiles[y][x].click();
 					}
 				}
 				ImGui::PopStyleColor(2);
@@ -103,103 +133,84 @@ void Board::render()
 	ImGui::End();
 }
 
-Board &Board::setBoardSize(int size)
+Board &Board::setNumberOfMines(int size)
 {
-	m_boardSize = size;
-	initTiles();
+	m_numberOfMines = size;
+	m_gameOver = false;
+	m_initialized = false;
+	for (auto &row : m_tiles) {
+		for (auto &tile : row) {
+			tile.click(false);
+		}
+	}
 	return *this;
 }
 
-std::vector<int> Board::scores() const
+void Board::initTiles(int x, int y)
 {
-	std::vector<int> playerScores;
-	playerScores.reserve(m_players.size());
-	std::transform(m_players.cbegin(),
-					m_players.cend(),
-					std::back_inserter(playerScores),
-					[](auto &player) { return player->score(); });
-
-	return playerScores;
-}
-
-std::vector<std::shared_ptr<Player>> Board::players() const
-{
-	return m_players;
-}
-
-std::shared_ptr<Player> Board::currentPlayer() const
-{
-	return m_currentPlayer;
-}
-
-void Board::initTiles()
-{
-	std::shared_ptr<Player> defaultPlayer(new Player(-1, "Empty", Player::Ocupant::Empty, "", 0, 0));
-
+	m_minePositions = generateMinePositions(x, y);
 	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
-	ImVec4 orange = (ImVec4)ImColor::HSV(1.1f, 0.6f, 0.6f, 0.5f);
 
 	m_tiles.clear();
-	m_tiles.resize(m_boardSize);
-	for (int y = 0; y < m_boardSize; y++) {
+	m_tiles.resize(m_height);
+	for (int y = 0; y < m_height; y++) {
 		std::vector<Tile> row;
-		for (size_t x = 0; x < m_boardSize; x++) {
-			ImVec4 color;
-			if (y % 2) {
-				color = x % 2 ? green : orange;
-			}
-			else {
-				color = x % 2 ? orange : green;
-			}
+		for (size_t x = 0; x < m_width; x++) {
+			int cnt = countSurroundingMines(x, y);
+			Icon::Ptr icon = m_icons[cnt];
 
-			Tile tile(defaultPlayer, color);
-			if (middleTilePlayer(y, x) != Player::Ocupant::Empty) {
-				tile.setOcupant(*std::find_if(m_players.begin(), m_players.end(), [&](std::shared_ptr<Player> p) {
-					return p->ocupation() == middleTilePlayer(y, x);
-				}));
-			}
-			row.emplace_back(tile);
+			row.emplace_back(Tile(icon, green));
 		}
 		m_tiles[y] = row;
 	}
+	m_initialized = true;
 }
 
-Player::Ocupant Board::middleTilePlayer(int y, int x)
+bool Board::isInRange(Pose pose, Pose generated, int range)
 {
-	if (y == m_boardSize/2 - 1 || y == m_boardSize/2) {
-		if (x == y) {
-			return Player::Ocupant::Black;
+	return (generated.x >= pose.x - range && generated.x <= pose.x + range) &&
+		(generated.y >= pose.y - range && generated.y <= pose.y + range);
+}
+
+std::unordered_set<Pose> Board::generateMinePositions(int x, int y)
+{
+	std::unordered_set<Pose> minePositions;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution hDis(0, m_height - 1);
+	std::uniform_int_distribution wDis(0, m_width - 1);
+
+	while (minePositions.size() < m_numberOfMines) {
+		int X = wDis(gen);
+		int Y = hDis(gen);
+
+		if (isInRange({x, y}, {X, Y}, 1)) {
+			continue;
 		}
-		else if (x == m_boardSize/2 - 1 || x == m_boardSize/2) {
-			return Player::Ocupant::White;
-		}
+
+		minePositions.insert({X, Y});
 	}
-	return Player::Ocupant::Empty;
+	return minePositions;
 }
 
-int Board::changeOponentTiles(int x, int y)
+int Board::countSurroundingMines(int x, int y)
 {
-	int score = 0;
+	int count = 0;
+	if (m_minePositions.find({x, y}) != m_minePositions.end()) {
+		return 9;
+	}
 
-	auto changeTiles = [this, &score] (int x, int y, Direction dir) {
-		score = checkDirection(x, y, {x, y}, dir);
-		if (score) {
-			int tmpx = x + dir.x;
-			int tmpy = y + dir.y;
-			while (m_tiles[tmpy][tmpx].ocupant() != m_currentPlayer) {
-				m_tiles[tmpy][tmpx].setOcupant(m_currentPlayer);
-				tmpx += dir.x;
-				tmpy += dir.y;
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			if (!tileExists(x,y)) {
+				continue;
+			}
+			if (m_minePositions.find({x + j, y + i}) != m_minePositions.end()) {
+				count++;
 			}
 		}
-	};
-
-	changeTiles(x, y, {-1, 0});
-	changeTiles(x, y, {1, 0});
-	changeTiles(x, y, {0, -1});
-	changeTiles(x, y, {0, 1});
-
-	return score;
+	}
+	return count;
 }
 
 void Board::setButtonColor(int x, int y)
@@ -215,87 +226,21 @@ void Board::setButtonColor(int x, int y)
 	}
 }
 
-int Board::isTilePlayable(int x, int y)
+bool Board::isTilePlayable(int x, int y)
 {
-	if (m_tiles[y][x].ocupant()->ocupation() == Player::Ocupant::Empty) {
-		int score = checkDirection(x, y, {x, y}, {-1, 0})
-				+ checkDirection(x, y, {x, y}, {1, 0})
-				+ checkDirection(x, y, {x, y}, {0, -1})
-				+ checkDirection(x, y, {x, y}, {0, 1});
-		return score;
-	}
-	return 0;
-}
-
-int Board::checkDirection(int x, int y, const Direction &init, const Direction &dir)
-{
-	int score = 0;
-
-	std::function<bool(int, int)> check = [this, &init, &dir, &score, &check] (int x, int y) {
-		x += dir.x;
-		y += dir.y;
-		if (tileExists(x, y)) {
-			if (m_tiles[y][x].belongsToOponent(m_currentPlayer)) {
-				score++;
-				return check(x, y);
-			}
-			else if (m_tiles[y][x].belongsToUs(m_currentPlayer)) {
-				return (std::abs(init.x - x) + std::abs(init.y - y)) > 1;
-			}
-		}
-		return false;
-	};
-
-	if (!check(x, y)) {
-		score = 0;
-	}
-	return score;
+	return !m_tiles[y][x].clicked();
 }
 
 bool Board::tileExists(int x, int y)
 {
-	return x >= 0 && x < m_boardSize && y >= 0 && y < m_boardSize;
-}
-
-void Board::findBestTileCapture()
-{
-	int bestScore = 0;
-	int bestX = -1;
-	int bestY = -1;
-
-	for (size_t i = 0; i < m_boardSize; i++) {
-		for (size_t j = 0; j < m_boardSize; j++) {
-			int score = isTilePlayable(j, i);
-			if (score > bestScore) {
-				bestScore = score;
-				bestX = j;
-				bestY = i;
-			}
-		}
-	}
-
-	if (bestY != -1) {
-		m_tiles[bestY][bestX].setOcupant(m_currentPlayer);
-		changeOponentTiles(bestX, bestY);
-	}
-	else {
-		m_gameOver = true;
-	}
-
-	for(auto &player : m_players) {
-		player->setScore(getPlayerScore(player));
-	}
-	m_currentPlayer = m_currentPlayer == m_players.front() ? m_players.back() : m_players.front();
-	if (!isGamePlayable()) {
-		m_gameOver = true;
-	}
+	return x >= 0 && x < m_numberOfMines && y >= 0 && y < m_numberOfMines;
 }
 
 bool Board::isGamePlayable()
 {
-	for (size_t i = 0; i < m_boardSize; i++) {
-		for (size_t j = 0; j < m_boardSize; j++) {
-			if (isTilePlayable(j, i) > 0) {
+	for (size_t i = 0; i < m_numberOfMines; i++) {
+		for (size_t j = 0; j < m_numberOfMines; j++) {
+			if (isTilePlayable(j, i)) {
 				return true;
 			}
 		}
@@ -303,12 +248,49 @@ bool Board::isGamePlayable()
 	return false;
 }
 
-int Board::getPlayerScore(std::shared_ptr<Player> player) const
+void Board::clickAllEmptyTiles(int x, int y)
 {
-	return std::accumulate(m_tiles.begin(), m_tiles.end(), 0, [&] (int sum, std::vector<Tile> row) {
-		return std::accumulate(row.begin(), row.end(), sum, [&] (int sum, Tile tile) {
-			return tile.belongsToUs(player) ? sum + 1 : sum;
-		});
-	});
+	if (!tileExists(x, y)) {
+		return;
+	}
+	if (m_tiles[y][x].clicked()) {
+		return;
+	}
+	m_tiles[y][x].click();
+	if (countSurroundingMines(x, y) != 0) {
+		return;
+	}
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; ++j) {
+			clickAllEmptyTiles(x + j, y + i);
+		}
+	}
 }
 
+void Board::setAllTilesClicked()
+{
+	for(auto &line : m_tiles) {
+		for(auto &tile : line) {
+			tile.click();
+		}
+	}
+}
+
+void Board::markMine(int x, int y)
+{
+	m_tiles[y][x].setOcupant(m_icons[(int)Icon::Ocupant::Flag]).click();
+
+}
+
+void Board::unmarkMine(int x, int y)
+{
+	for(auto &position : m_minePositions) {
+		if (position.x == x && position.y == y) {
+			m_tiles[y][x].setOcupant(m_icons[(int)Icon::Ocupant::Mine]);
+			return;
+		}
+	}
+
+	int cnt = countSurroundingMines(x, y);
+	m_tiles[y][x].setOcupant(m_icons[cnt]).click(false);
+}

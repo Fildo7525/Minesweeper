@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Player.h"
+#include "Icon.h"
 #include "imgui.h"
 
 #include <memory>
@@ -8,17 +8,22 @@
 class Tile
 {
 public:
-	explicit Tile(std::shared_ptr<Player> ocupant, ImColor color);
+	explicit Tile(std::shared_ptr<Icon> ocupant, ImColor color, bool clicked = false);
 
-	void setOcupant(const std::shared_ptr<Player> &ocupant) { m_ocupant = ocupant; }
-	bool belongsToOponent(const std::shared_ptr<Player> &player) const;
-	bool belongsToUs(const std::shared_ptr<Player> &player) const;
+	bool belongsToOponent(const std::shared_ptr<Icon> &player) const;
+	bool belongsToUs(const std::shared_ptr<Icon> &player) const;
+
+	Tile &setOcupant(const std::shared_ptr<Icon> &ocupant) { m_ocupant = ocupant; return *this; }
+
+	bool clicked() const { return m_clicked; }
+	Tile &click(bool c = true) { m_clicked = c; return *this; }
 
 	ImColor color() const { return m_color; }
 	Tile &setColor(const ImColor &color);
-	bool selected() const { return m_ocupant->ocupation() != Player::Ocupant::Empty; }
-	std::shared_ptr<Player> ocupant() const;
+	bool selected() const { return m_ocupant->ocupation() != Icon::Ocupant::Empty; }
+	std::shared_ptr<Icon> ocupant() const;
 private:
 	ImColor m_color;
-	std::shared_ptr<Player> m_ocupant;
+	std::shared_ptr<Icon> m_ocupant;
+	bool m_clicked;
 };

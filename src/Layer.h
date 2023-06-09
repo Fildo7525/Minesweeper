@@ -7,14 +7,14 @@ class Layer
 {
 public:
 	explicit Layer(const std::string &name)
-		: m_windowFlags(0)
+		: m_windowFlags(ImGuiWindowFlags_None)
 		, m_name(name)
 	{
-		m_windowFlags |= ImGuiWindowFlags_NoTitleBar;
-		m_windowFlags |= ImGuiWindowFlags_NoCollapse;
-		m_windowFlags |= ImGuiWindowFlags_NoScrollbar;
-		m_windowFlags |= ImGuiWindowFlags_NoMove;
-		m_windowFlags |= ImGuiWindowFlags_NoResize;
+		// m_windowFlags |= ImGuiWindowFlags_NoTitleBar;
+		// m_windowFlags |= ImGuiWindowFlags_NoCollapse;
+		// m_windowFlags |= ImGuiWindowFlags_NoScrollbar;
+		// m_windowFlags |= ImGuiWindowFlags_NoMove;
+		// m_windowFlags |= ImGuiWindowFlags_NoResize;
 	}
 
 	virtual ~Layer() {}

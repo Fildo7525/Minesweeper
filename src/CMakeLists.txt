@@ -1,8 +1,14 @@
 add_library(lib
 	Application.cpp
 	Application.h
+	Board.cpp
+	Board.h
+	Icon.cpp
+	Icon.h
 	Image.cpp
 	Image.h
+	Tile.cpp
+	Tile.h
 	Layer.h
 )
 

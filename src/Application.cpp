@@ -87,8 +87,8 @@ void Application::run()
 
 		if (m_config.enableDocking) {
 			ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-			dockspace_flags |= ImGuiDockNodeFlags_NoResize
-							| ImGuiDockNodeFlags_AutoHideTabBar;
+			// dockspace_flags |= ImGuiDockNodeFlags_NoResize
+			// 				| ImGuiDockNodeFlags_AutoHideTabBar;
 			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), dockspace_flags);
 		}
 
@@ -164,16 +164,16 @@ void Application::Init()
 	glfwMakeContextCurrent(m_window);
 	glfwSwapInterval(1); // Enable vsync
 
-	if (m_config.fullscreen) {
-		glfwMaximizeWindow(m_window);
-	}
-	else {
-		glfwRestoreWindow(m_window);
-	}
-
-	if (!m_config.resizable) {
-		glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, GLFW_FALSE);
-	}
+	// if (m_config.fullscreen) {
+	// 	glfwMaximizeWindow(m_window);
+	// }
+	// else {
+	// 	glfwRestoreWindow(m_window);
+	// }
+	//
+	// if (!m_config.resizable) {
+	// 	glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, GLFW_FALSE);
+	// }
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -187,9 +187,9 @@ void Application::Init()
 	//io.ConfigViewportsNoTaskBarIcon = true;
 
 	// Setup Dear ImGui style
-	// ImGui::StyleColorsDark();
+	ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
-	ImGui::StyleColorsClassic();
+	// ImGui::StyleColorsClassic();
 
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 	ImGuiStyle& style = ImGui::GetStyle();

@@ -1,17 +1,18 @@
 #include "Tile.h"
 
-Tile::Tile(std::shared_ptr<Player> ocupant, ImColor color)
+Tile::Tile(std::shared_ptr<Icon> ocupant, ImColor color, bool clicked)
 	: m_ocupant(ocupant)
 	, m_color(color)
+	, m_clicked(clicked)
 {
 }
 
-bool Tile::belongsToOponent(const std::shared_ptr<Player> &player) const
+bool Tile::belongsToOponent(const std::shared_ptr<Icon> &player) const
 {
-	return m_ocupant != player && m_ocupant->ocupation() != Player::Ocupant::Empty;
+	return m_ocupant != player && m_ocupant->ocupation() != Icon::Ocupant::Empty;
 }
 
-bool Tile::belongsToUs(const std::shared_ptr<Player> &player) const
+bool Tile::belongsToUs(const std::shared_ptr<Icon> &player) const
 {
 	return m_ocupant == player;
 }
@@ -22,7 +23,7 @@ Tile &Tile::setColor(const ImColor &color)
 	return *this;
 }
 
-std::shared_ptr<Player> Tile::ocupant() const
+std::shared_ptr<Icon> Tile::ocupant() const
 {
 	return m_ocupant;
 }

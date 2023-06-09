@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Board.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,8 @@ int main(int argc, char *argv[])
 		true,
 		"/usr/share/fonts/BS/BitstromWeraNerdFont-Regular.ttf"
 	});
+
+	app->addLayer(std::make_shared<Board>(10, 10, 30));
 
 	app->run();
 	return 0;
