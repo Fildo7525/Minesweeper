@@ -1,9 +1,10 @@
 #include "Tile.h"
 
-Tile::Tile(std::shared_ptr<Icon> ocupant, ImColor color, bool clicked)
+Tile::Tile(std::shared_ptr<Icon> ocupant, ImColor color, Pose position, bool clicked)
 	: m_ocupant(ocupant)
 	, m_color(color)
 	, m_clicked(clicked)
+	, m_position(position)
 {
 }
 

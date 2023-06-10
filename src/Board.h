@@ -9,26 +9,6 @@
 #include <vector>
 #include <unordered_set>
 
-struct Pose {
-	int x;
-	int y;
-
-};
-
-bool operator==(const Pose &lhs, const Pose &rhs);
-
-namespace std
-{
-	template <>
-	struct hash<Pose>
-	{
-		size_t operator()(Pose const &pose) const noexcept
-		{
-			return std::hash<int>{}(pose.x) ^ (std::hash<int>{}(pose.y) << 1);
-		}
-	};
-}
-
 class Board
 	: public Layer
 {
@@ -48,6 +28,7 @@ private:
 	bool isInRange(Pose pose, Pose generated, int range);
 	std::unordered_set<Pose> generateMinePositions(int x, int y);
 	int countSurroundingMines(int x, int y);
+	int countSurroundingFlags(int x, int y);
 	void setButtonColor(int x, int y);
 
 	bool isTilePlayable(int x, int y);
@@ -56,6 +37,7 @@ private:
 	void findBestTileCapture();
 	bool isGamePlayable();
 	void clickAllEmptyTiles(int x, int y);
+	void clickPossibleTiles(int x, int y);
 	void setAllTilesClicked();
 
 	void markMine(int x, int y);

@@ -10,10 +10,10 @@ int main(int argc, char *argv[])
 		true,
 		false,
 		true,
-		"/usr/share/fonts/BS/BitstromWeraNerdFont-Regular.ttf"
+		"../font/BitstromWeraNerdFontMono-Regular.ttf"
 	});
 
-	app->addLayer(std::make_shared<Board>(10, 10, 30));
+	app->addLayer(std::make_shared<Board>(10, 10, 20));
 
 	app->run();
 	return 0;

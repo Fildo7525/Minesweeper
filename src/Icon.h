@@ -20,7 +20,8 @@ public:
 		Seven,
 		Eight,
 		Mine,
-		Flag
+		Flag,
+		WrongFlag
 	};
 
 	explicit Icon(Ocupant ocupation, const std::string &texturePath, int width, int height);

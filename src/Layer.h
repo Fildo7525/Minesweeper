@@ -12,7 +12,7 @@ public:
 	{
 		// m_windowFlags |= ImGuiWindowFlags_NoTitleBar;
 		// m_windowFlags |= ImGuiWindowFlags_NoCollapse;
-		// m_windowFlags |= ImGuiWindowFlags_NoScrollbar;
+		m_windowFlags |= ImGuiWindowFlags_NoScrollbar;
 		// m_windowFlags |= ImGuiWindowFlags_NoMove;
 		// m_windowFlags |= ImGuiWindowFlags_NoResize;
 	}
