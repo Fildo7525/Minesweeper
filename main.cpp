@@ -1,11 +1,13 @@
 #include "Application.h"
 #include "Board.h"
+#include "Status.h"
+#include <memory>
 
 int main(int argc, char *argv[])
 {
 	auto app = Application::create({
 		"Minesweeper",
-		1200,
+		1000,
 		720,
 		true,
 		false,
@@ -13,7 +15,9 @@ int main(int argc, char *argv[])
 		"../font/BitstromWeraNerdFontMono-Regular.ttf"
 	});
 
-	app->addLayer(std::make_shared<Board>(10, 10, 20));
+	std::shared_ptr<Board> board(new Board(10, 10, 20));
+	app->addLayer(board);
+	app->addLayer(std::make_shared<Status>(board));
 
 	app->run();
 	return 0;

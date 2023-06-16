@@ -7,9 +7,11 @@ add_library(lib
 	Icon.h
 	Image.cpp
 	Image.h
+	Layer.h
+	Status.cpp
+	Status.h
 	Tile.cpp
 	Tile.h
-	Layer.h
 )
 
 target_include_directories(lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

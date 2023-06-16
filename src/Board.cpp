@@ -25,6 +25,7 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_width(width)
 	, m_height(height)
 	, m_numberOfMines(numberOfMines)
+	, m_numberOfFlags(0)
 {
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0));
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::One, "../images/one.png", 10, 10));
@@ -78,6 +79,7 @@ void Board::render()
 		if (ImGui::Button("Play Again")) {
 			m_gameOver = false;
 			m_initialized = false;
+			m_numberOfFlags = 0;
 
 			for (auto &row : m_tiles) {
 				for (auto &tile : row) {
@@ -111,6 +113,7 @@ void Board::render()
 				if (ImGui::ImageButton((void *)(intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
 					if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
 						if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+							m_numberOfFlags--;
 							unmarkMine(x, y);
 						}
 					}
@@ -136,6 +139,7 @@ void Board::render()
 						}
 
 						if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+							m_numberOfFlags++;
 							markMine(x, y);
 						}
 
@@ -275,7 +279,9 @@ void Board::setButtonColor(int x, int y)
 bool Board::isTilePlayable(int x, int y)
 {
 	const auto &tile = m_tiles[y][x];
-	return !tile.clicked() || (m_minePositions.find({x, y}) == m_minePositions.end() && tile.ocupant()->ocupation() == Icon::Ocupant::Flag);
+	return !tile.clicked()
+			|| (m_minePositions.find(tile.position()) == m_minePositions.end()
+				&& tile.ocupant()->ocupation() == Icon::Ocupant::Flag);
 }
 
 bool Board::tileExists(int x, int y)
@@ -285,15 +291,17 @@ bool Board::tileExists(int x, int y)
 
 bool Board::isGamePlayable()
 {
-	for (size_t i = 0; i < m_numberOfMines; i++) {
-		for (size_t j = 0; j < m_numberOfMines; j++) {
+	if (m_numberOfFlags != m_numberOfMines) {
+		return true;
+	}
+
+	for (size_t i = 0; i < m_width; i++) {
+		for (size_t j = 0; j < m_height; j++) {
 			if (isTilePlayable(j, i)) {
-				std::cout << "The game is playable (" << j << ", " << i << "\n";
 				return true;
 			}
 		}
 	}
-	std::cout << "The game is not playable\n";
 	return false;
 }
 
@@ -319,25 +327,20 @@ void Board::clickAllEmptyTiles(int x, int y)
 void Board::clickPossibleTiles(int x, int y)
 {
 	if (!tileExists(x, y)) {
-		std::cout << "Tile " << x << ", " << y << " does not exist.\n";
 		return;
 	}
 	if (m_tiles[y][x].clicked()) {
-		std::cout << "Tile " << x << ", " << y << " is already clicked.\n";
 		return;
 	}
 
-	std::cout << "Clicking on tile " << x << ", " << y << '\n';
 	m_tiles[y][x].click();
 
 	if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
-		std::cout << "You lost\n";
 		m_gameOver = true;
 		return;
 	}
 
 	if (countSurroundingFlags(x, y) != (int)m_tiles[y][x].ocupant()->ocupation()) {
-		std::cout << "Add more flags around tile " << x << ", " << y << "\n";
 		return;
 	}
 	for (int i = -1; i < 2; i++) {

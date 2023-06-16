@@ -19,7 +19,8 @@ public:
 	void render() override;
 
 	Board &setNumberOfMines(int size);
-	int &numberOfMines() { return m_numberOfMines; }
+	int totalNumberOfMines() const { return m_numberOfMines; }
+	int numberOfFlags() const { return m_numberOfFlags; }
 	bool isGameOver() const { return m_gameOver; }
 
 private:
@@ -52,4 +53,5 @@ private:
 	int m_width;
 	int m_height;
 	int m_numberOfMines;
+	int m_numberOfFlags;
 };
