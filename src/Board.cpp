@@ -171,6 +171,7 @@ void Board::setDifficulty(int difficulty)
 	m_height = getSizeFromDifficulty();
 	m_width = m_height;
 	setupEmptyTiles();
+	setNumberOfMines((m_height*m_width) / 5);
 }
 
 void Board::setupEmptyTiles()
