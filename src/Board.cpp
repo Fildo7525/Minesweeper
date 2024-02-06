@@ -1,14 +1,7 @@
 #include "Board.h"
 #include "Icon.h"
 #include "imgui.h"
-#include "imgui_impl_opengl3.h"
 
-#include <algorithm>
-#include <cmath>
-#include <functional>
-#include <numeric>
-#include <iostream>
-#include <sstream>
 #include <random>
 
 bool operator==(const Pose &lhs, const Pose &rhs)
@@ -26,6 +19,8 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_height(height)
 	, m_numberOfMines(numberOfMines)
 	, m_numberOfFlags(0)
+	, m_start(std::chrono::steady_clock::now())
+	, m_difficulty(0)
 {
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0));
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::One, "../images/one.png", 10, 10));
@@ -86,7 +81,7 @@ void Board::render()
 					tile.click(false);
 				}
 			}
-
+			m_start = std::chrono::steady_clock::now();
 		}
 		ImGui::End();
 	}
@@ -173,6 +168,12 @@ Board &Board::setNumberOfMines(int size)
 		}
 	}
 	return *this;
+}
+
+long Board::elapsedTime()
+{
+	auto diff = std::chrono::steady_clock::now() - m_start;
+	return std::chrono::duration_cast<std::chrono::seconds>(diff).count();
 }
 
 void Board::initTiles(int X, int Y)
@@ -279,9 +280,7 @@ void Board::setButtonColor(int x, int y)
 bool Board::isTilePlayable(int x, int y)
 {
 	const auto &tile = m_tiles[y][x];
-	return !tile.clicked()
-			|| (m_minePositions.find(tile.position()) == m_minePositions.end()
-				&& tile.ocupant()->ocupation() == Icon::Ocupant::Flag);
+	return !tile.clicked();
 }
 
 bool Board::tileExists(int x, int y)
@@ -381,3 +380,16 @@ void Board::unmarkMine(int x, int y)
 	int cnt = countSurroundingMines(x, y);
 	m_tiles[y][x].setOcupant(m_icons[cnt]).click(false);
 }
+
+int Board::getSizeFromDifficulty()
+{
+	switch (m_difficulty) {
+		case 0:
+			return 10;
+		case 1:
+			return 15;
+		case 2:
+			return 20;
+	}
+}
+

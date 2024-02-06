@@ -5,7 +5,7 @@
 #include "Icon.h"
 #include "Tile.h"
 
-#include <memory>
+#include <chrono>
 #include <vector>
 #include <unordered_set>
 
@@ -22,6 +22,9 @@ public:
 	int totalNumberOfMines() const { return m_numberOfMines; }
 	int numberOfFlags() const { return m_numberOfFlags; }
 	bool isGameOver() const { return m_gameOver; }
+	long elapsedTime();
+	int &getDifficulty() { return m_difficulty; }
+	void setDifficulty(int difficulty) { m_difficulty = difficulty; }
 
 private:
 
@@ -44,6 +47,8 @@ private:
 	void markMine(int x, int y);
 	void unmarkMine(int x, int y);
 
+	int getSizeFromDifficulty();
+
 private:
 	bool m_initialized;
 	std::vector<Icon::Ptr> m_icons;
@@ -54,4 +59,6 @@ private:
 	int m_height;
 	int m_numberOfMines;
 	int m_numberOfFlags;
+	std::chrono::time_point<std::chrono::steady_clock> m_start;
+	int m_difficulty;
 };
