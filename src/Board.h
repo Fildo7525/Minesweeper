@@ -6,6 +6,7 @@
 #include "Tile.h"
 
 #include <chrono>
+#include <utility>
 #include <vector>
 #include <unordered_set>
 
@@ -24,10 +25,11 @@ public:
 	bool isGameOver() const { return m_gameOver; }
 	long elapsedTime();
 	int &getDifficulty() { return m_difficulty; }
-	void setDifficulty(int difficulty) { m_difficulty = difficulty; }
+	void setDifficulty(int difficulty);
 
 private:
 
+	void setupEmptyTiles();
 	void initTiles(int x, int y);
 	bool isInRange(Pose pose, Pose generated, int range);
 	std::unordered_set<Pose> generateMinePositions(int x, int y);

@@ -35,18 +35,7 @@ Board::Board(int width, int height, int numberOfMines)
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Flag, "../images/mine_flag.png", 10, 10));
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::WrongFlag, "../images/mine_wrong_flag.png", 10, 10));
 
-	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
-
-	m_tiles.clear();
-	m_tiles.resize(m_height);
-	for (int y = 0; y < m_height; y++) {
-		std::vector<Tile> row;
-		for (int x = 0; x < m_width; x++) {
-			int cnt = countSurroundingMines(x, y);
-			row.emplace_back(Tile(m_icons[0], green, {x,y}));
-		}
-		m_tiles[y] = row;
-	}
+	setupEmptyTiles();
 }
 
 void SelectableColor(ImU32 color)
@@ -174,6 +163,30 @@ long Board::elapsedTime()
 {
 	auto diff = std::chrono::steady_clock::now() - m_start;
 	return std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+}
+
+void Board::setDifficulty(int difficulty)
+{
+	m_difficulty = difficulty;
+	m_height = getSizeFromDifficulty();
+	m_width = m_height;
+	setupEmptyTiles();
+}
+
+void Board::setupEmptyTiles()
+{
+	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
+
+	m_tiles.clear();
+	m_tiles.resize(m_height);
+	for (int y = 0; y < m_height; y++) {
+		std::vector<Tile> row;
+		for (int x = 0; x < m_width; x++) {
+			int cnt = countSurroundingMines(x, y);
+			row.emplace_back(Tile(m_icons[0], green, {x,y}));
+		}
+		m_tiles[y] = row;
+	}
 }
 
 void Board::initTiles(int X, int Y)
@@ -391,5 +404,6 @@ int Board::getSizeFromDifficulty()
 		case 2:
 			return 20;
 	}
+	return 10;
 }
 
