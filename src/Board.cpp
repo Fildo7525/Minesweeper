@@ -79,12 +79,14 @@ void Board::render()
 	ImGui::Begin("Board", NULL, m_windowFlags);
 	int buttonWidth = (ImGui::GetWindowSize().x - 50) / m_width - 1;
 	int buttonHeight = (ImGui::GetWindowSize().y - 80) / m_height - 1;
+	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
+
 	auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight;
 
 	for (int y = 0; y < m_height; y++) {
 		for (int x = 0; x < m_width; x++) {
 			if (x > 0) {
-				ImGui::SameLine(x*(buttonWidth + 4) + 8);
+				ImGui::SameLine(x*(buttonSize + 4) + 8);
 			}
 			int id = y * m_tiles.front().size() + x;
 			ImGui::PushID(id);
@@ -92,7 +94,7 @@ void Board::render()
 			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)m_tiles[y][x].color());
 			if (m_tiles[y][x].clicked()) {
 				setButtonColor(x, y);
-				ImVec2 size(buttonWidth - 8, buttonHeight - 6);
+				ImVec2 size(buttonSize - 8, buttonSize - 6);
 
 				if (ImGui::ImageButton((void *)(intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
 					if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
@@ -114,7 +116,7 @@ void Board::render()
 			}
 			else {
 				setButtonColor(x, y);
-				ImVec2 size(buttonWidth, buttonHeight);
+				ImVec2 size(buttonSize, buttonSize);
 
 				if (ImGui::Button("", size, buttonFlags )) {
 					if (isTilePlayable(x, y)) {
