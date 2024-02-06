@@ -64,3 +64,4 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> m_start;
 	int m_difficulty;
 };
+
