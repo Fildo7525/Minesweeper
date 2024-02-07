@@ -1,12 +1,14 @@
 #include "Status.h"
 #include "imgui.h"
 
-Status::Status(std::shared_ptr<Board>  &board)
+#define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+
+Status::Status(std::shared_ptr<Board> &board)
 	: Layer("Status")
 	, m_board(board)
 	, m_difficulty(0)
+	, m_numberOfMines(board->totalNumberOfMines())
 {
-
 }
 
 void Status::render()
@@ -27,6 +29,13 @@ void Status::render()
 		if (ImGui::RadioButton("Hard", &m_difficulty, 2)) {
 			m_board->setDifficulty(2);
 		}
+	}
+
+	if (ImGui::InputInt("Number of Mines", &m_numberOfMines)) {
+		m_numberOfMines = m_numberOfMines < 1 ? 1 : m_numberOfMines;
+		m_numberOfMines = m_numberOfMines >= m_board->totalNumberOfCells()-9 ? m_board->totalNumberOfCells()-9 : m_numberOfMines;
+		m_board->setNumberOfMines(m_numberOfMines);
+		m_board->resetTimer();
 	}
 
 	ImGui::End();

@@ -24,8 +24,10 @@ public:
 	int numberOfFlags() const { return m_numberOfFlags; }
 	bool isGameOver() const { return m_gameOver; }
 	long elapsedTime();
+	void resetTimer() { m_start = std::chrono::steady_clock::now(); }
 	int &getDifficulty() { return m_difficulty; }
 	void setDifficulty(int difficulty);
+	int totalNumberOfCells() const { return m_width * m_height; }
 
 private:
 

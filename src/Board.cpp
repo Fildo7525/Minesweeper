@@ -151,6 +151,7 @@ void Board::render()
 Board &Board::setNumberOfMines(int size)
 {
 	m_numberOfMines = size;
+	m_numberOfFlags = 0;
 	m_gameOver = false;
 	m_initialized = false;
 	for (auto &row : m_tiles) {
