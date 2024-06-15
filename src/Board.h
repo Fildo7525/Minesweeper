@@ -14,6 +14,7 @@ class Board
 	: public Layer
 {
 public:
+	using time = std::chrono::time_point<std::chrono::steady_clock>;
 
 	using Tiles = std::vector<std::vector<Tile>>;
 	explicit Board(int width, int height, int numberOfMines);
@@ -24,7 +25,7 @@ public:
 	int numberOfFlags() const { return m_numberOfFlags; }
 	bool isGameOver() const { return m_gameOver; }
 	long elapsedTime();
-	void resetTimer() { m_start = std::chrono::steady_clock::now(); }
+	void resetTimer() { m_start = nullptr; }
 	int &getDifficulty() { return m_difficulty; }
 	void setDifficulty(int difficulty);
 	int totalNumberOfCells() const { return m_width * m_height; }
@@ -63,7 +64,8 @@ private:
 	int m_height;
 	int m_numberOfMines;
 	int m_numberOfFlags;
-	std::chrono::time_point<std::chrono::steady_clock> m_start;
+	std::shared_ptr<time> m_start;
 	int m_difficulty;
+	long m_lastElapsedTime;
 };
 

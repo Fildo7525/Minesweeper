@@ -19,7 +19,7 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_height(height)
 	, m_numberOfMines(numberOfMines)
 	, m_numberOfFlags(0)
-	, m_start(std::chrono::steady_clock::now())
+	, m_start(nullptr)
 	, m_difficulty(0)
 {
 	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0));
@@ -64,13 +64,13 @@ void Board::render()
 			m_gameOver = false;
 			m_initialized = false;
 			m_numberOfFlags = 0;
+			resetTimer();
 
 			for (auto &row : m_tiles) {
 				for (auto &tile : row) {
 					tile.click(false);
 				}
 			}
-			m_start = std::chrono::steady_clock::now();
 		}
 		ImGui::End();
 	}
@@ -122,6 +122,7 @@ void Board::render()
 					if (isTilePlayable(x, y)) {
 						if (!m_initialized) {
 							initTiles(x, y);
+							m_start = std::make_shared<time>(std::chrono::steady_clock::now());
 						}
 
 						if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
@@ -164,8 +165,16 @@ Board &Board::setNumberOfMines(int size)
 
 long Board::elapsedTime()
 {
-	auto diff = std::chrono::steady_clock::now() - m_start;
-	return std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+	if (m_start == nullptr) {
+		return -1;
+	}
+
+	if (!m_gameOver) {
+		auto diff = std::chrono::steady_clock::now() - *m_start;
+		m_lastElapsedTime = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+	}
+
+	return m_lastElapsedTime;
 }
 
 void Board::setDifficulty(int difficulty)
@@ -175,6 +184,7 @@ void Board::setDifficulty(int difficulty)
 	m_width = m_height;
 	setupEmptyTiles();
 	setNumberOfMines((m_height*m_width) / 5);
+	resetTimer();
 }
 
 void Board::setupEmptyTiles()
