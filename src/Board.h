@@ -53,6 +53,7 @@ private:
 	void unmarkMine(int x, int y);
 
 	int getSizeFromDifficulty();
+	bool allMinesMarked();
 
 private:
 	bool m_initialized;

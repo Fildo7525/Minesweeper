@@ -128,6 +128,10 @@ void Board::render()
 						if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
 							m_numberOfFlags++;
 							markMine(x, y);
+							if (allMinesMarked()) {
+								m_gameOver = true;
+								setAllTilesClicked();
+							}
 						}
 
 						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
@@ -421,3 +425,13 @@ int Board::getSizeFromDifficulty()
 	return 10;
 }
 
+
+bool Board::allMinesMarked()
+{
+	for (auto &position : m_minePositions) {
+		if (!m_tiles[position.y][position.x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+			return false;
+		}
+	}
+	return true;
+}
