@@ -193,15 +193,13 @@ void Board::setDifficulty(int difficulty)
 
 void Board::setupEmptyTiles()
 {
-	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
-
 	m_tiles.clear();
 	m_tiles.resize(m_height);
 	for (int y = 0; y < m_height; y++) {
 		std::vector<Tile> row;
 		for (int x = 0; x < m_width; x++) {
 			int cnt = countSurroundingMines(x, y);
-			row.emplace_back(Tile(m_icons[0], green, {x,y}));
+			row.emplace_back(Tile(m_icons[0], {x,y}));
 		}
 		m_tiles[y] = row;
 	}
@@ -210,7 +208,6 @@ void Board::setupEmptyTiles()
 void Board::initTiles(int X, int Y)
 {
 	m_minePositions = generateMinePositions(X, Y);
-	ImVec4 green = (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f);
 
 	m_tiles.clear();
 	m_tiles.resize(m_height);
@@ -220,7 +217,7 @@ void Board::initTiles(int X, int Y)
 			int cnt = countSurroundingMines(x, y);
 			Icon::Ptr icon = m_icons[cnt];
 
-			row.emplace_back(Tile(icon, green, {x, y}));
+			row.emplace_back(Tile(icon, {x, y}));
 		}
 		m_tiles[y] = row;
 	}
@@ -302,7 +299,6 @@ void Board::setButtonColor(int x, int y)
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
 	}
 	else {
-		
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)m_tiles[y][x].color());
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)m_tiles[y][x].color());
 	}

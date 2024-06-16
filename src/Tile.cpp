@@ -1,8 +1,12 @@
 #include "Tile.h"
 
-Tile::Tile(std::shared_ptr<Icon> ocupant, ImColor color, Pose position, bool clicked)
+#define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+#define BLACK_COLOR ImVec4(0.0f, 0.0f, 0.0f, 1.0f)
+#define GRAY_COLOR ImVec4(0.5f, 0.5f, 0.5f, 1.0f)
+#define GREEN_COLOR (ImVec4)ImColor::HSV(0.3f, 0.6f, 0.6f, 0.5f)
+
+Tile::Tile(std::shared_ptr<Icon> ocupant, Pose position, bool clicked)
 	: m_ocupant(ocupant)
-	, m_color(color)
 	, m_clicked(clicked)
 	, m_position(position)
 {
@@ -18,10 +22,21 @@ bool Tile::belongsToUs(const std::shared_ptr<Icon> &player) const
 	return m_ocupant == player;
 }
 
-Tile &Tile::setColor(const ImColor &color)
+ImColor Tile::color() const
 {
-	m_color = color;
-	return *this;
+	ImColor red(1.0f, 0.0f, 0.0f, 1.0f);
+	if (!m_clicked) {
+		return GREEN_COLOR;
+	}
+	if (m_ocupant->ocupation() == Icon::Ocupant::Empty) {
+		return BLACK_COLOR;
+	}
+
+	if (m_ocupant->ocupation() == Icon::Ocupant::Mine) {
+		return GRAY_COLOR;
+	}
+
+	return GREEN_COLOR;
 }
 
 std::shared_ptr<Icon> Tile::ocupant() const

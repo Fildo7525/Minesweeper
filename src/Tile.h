@@ -29,7 +29,7 @@ namespace std
 class Tile
 {
 public:
-	explicit Tile(std::shared_ptr<Icon> ocupant, ImColor color, Pose position, bool clicked = false);
+	explicit Tile(std::shared_ptr<Icon> ocupant, Pose position, bool clicked = false);
 
 	bool belongsToOponent(const std::shared_ptr<Icon> &player) const;
 	bool belongsToUs(const std::shared_ptr<Icon> &player) const;
@@ -40,8 +40,7 @@ public:
 	bool clicked() const { return m_clicked; }
 	Tile &click(bool c = true) { m_clicked = c; return *this; }
 
-	ImColor color() const { return m_color; }
-	Tile &setColor(const ImColor &color);
+	ImColor color() const;
 	bool selected() const { return m_ocupant->ocupation() != Icon::Ocupant::Empty; }
 	std::shared_ptr<Icon> ocupant() const;
 private:
