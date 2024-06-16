@@ -32,6 +32,10 @@ ImColor Tile::color() const
 		return BLACK_COLOR;
 	}
 
+	if (m_ocupant->ocupation() == Icon::Ocupant::Flag) {
+		return GRAY_COLOR;
+	}
+
 	if (m_ocupant->ocupation() == Icon::Ocupant::Mine) {
 		return GRAY_COLOR;
 	}

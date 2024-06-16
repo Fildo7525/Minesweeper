@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
-#include <memory>
 #include <GL/gl.h>
+#include <memory>
+#include <string>
 
 class Icon
 {

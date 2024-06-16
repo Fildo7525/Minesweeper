@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Application.h"
-#include "Layer.h"
 #include "Icon.h"
+#include "Layer.h"
 #include "Tile.h"
 
 #include <chrono>
-#include <utility>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 class Board
 	: public Layer

@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Board.h"
 #include "Status.h"
+
 #include <memory>
 
 int main(int argc, char *argv[])
