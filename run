@@ -1,0 +1,8 @@
+#!/bin/zsh
+cd build/
+make -j16
+if [ $? -eq 0 ];then
+	clear
+	./Minesweeper
+fi
+
