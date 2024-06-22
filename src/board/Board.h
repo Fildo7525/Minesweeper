@@ -51,6 +51,13 @@ private:
 	void unmarkMine(int x, int y);
 
 	int getSizeFromDifficulty();
+	/**
+	 * @brief adfjklajsdf
+	 *
+	 * a = b \over c
+	 *
+	 * @return return
+	 */
 	bool allMinesMarked();
 
 private:
