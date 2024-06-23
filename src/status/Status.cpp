@@ -73,12 +73,13 @@ void Status::render()
 		}
 	}
 
-	if (ImGui::InputInt("Number of Mines", &m_numberOfMines)) {
-		m_numberOfMines = m_numberOfMines < 1 ? 1 : m_numberOfMines;
-		m_numberOfMines = m_numberOfMines >= m_board->totalNumberOfCells()-9 ? m_board->totalNumberOfCells()-9 : m_numberOfMines;
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+	if (ImGui::InputInt("Mines", &m_numberOfMines)) {
+		m_numberOfMines = std::clamp(m_numberOfMines, 1, m_board->totalNumberOfCells()-9);
 		m_board->setNumberOfMines(m_numberOfMines);
 		m_board->resetTimer();
 	}
+	ImGui::PopItemWidth();
 
 	ImGui::End();
 }
