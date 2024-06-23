@@ -14,7 +14,7 @@ Status::Status(std::shared_ptr<Board> &board)
 
 void Status::render()
 {
-	ImGui::Begin("Game Status", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("Game Status", NULL, m_windowFlags);
 
 	ImGui::Text("Mines: %d / %d", m_board->numberOfFlags(), m_board->totalNumberOfMines());
 	auto time = m_board->elapsedTime();
@@ -40,7 +40,7 @@ void Status::render()
 			m_numberOfMines = m_board->totalNumberOfMines();
 		}
 		if (ImGui::RadioButton("Custom", &m_difficulty, 3)) {
-			m_board->setDifficulty(3);
+			m_board->setOnlyDifficulty(3);
 			m_localHeight = m_board->height();
 			m_localWidth = m_board->width();
 		}
@@ -55,7 +55,6 @@ void Status::render()
 
 			ImGui::SameLine();
 			if (ImGui::Button("Apply")) {
-				m_board->setOnlyDifficulty(3);
 
 				// Limit the width and height
 				m_board->width() = std::clamp(m_localWidth, 9, 30);
