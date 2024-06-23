@@ -87,9 +87,9 @@ void Application::run()
 
 		if (m_config.enableDocking) {
 			ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-			// dockspace_flags |= ImGuiDockNodeFlags_NoResize
-			// 				| ImGuiDockNodeFlags_AutoHideTabBar;
-			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), dockspace_flags);
+			dockspace_flags |= ImGuiDockNodeFlags_NoResize
+							| ImGuiDockNodeFlags_AutoHideTabBar;
+			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), dockspace_flags);
 		}
 
 		for(auto &layer : m_layers) {
@@ -164,16 +164,16 @@ void Application::Init()
 	glfwMakeContextCurrent(m_window);
 	glfwSwapInterval(1); // Enable vsync
 
-	// if (m_config.fullscreen) {
-	// 	glfwMaximizeWindow(m_window);
-	// }
-	// else {
-	// 	glfwRestoreWindow(m_window);
-	// }
-	//
-	// if (!m_config.resizable) {
-	// 	glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, GLFW_FALSE);
-	// }
+	if (m_config.fullscreen) {
+		glfwMaximizeWindow(m_window);
+	}
+	else {
+		glfwRestoreWindow(m_window);
+	}
+
+	if (!m_config.resizable) {
+		glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, GLFW_FALSE);
+	}
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -201,6 +201,9 @@ void Application::Init()
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+#ifdef __EMSCRIPTEN__
+	ImGui_ImplGlfw_InstallEmscriptenCanvasResizeCallback("#canvas");
+#endif
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	// Load Fonts
