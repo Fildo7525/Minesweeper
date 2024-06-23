@@ -78,8 +78,8 @@ void Board::render()
 
 
 	ImGui::Begin("Board", NULL, m_windowFlags);
-	int buttonWidth = (ImGui::GetWindowSize().x - 50) / m_width - 1;
-	int buttonHeight = (ImGui::GetWindowSize().y - 80) / m_height - 1;
+	int buttonWidth = (ImGui::GetWindowSize().x - 80) / m_width - 1;
+	int buttonHeight = (ImGui::GetWindowSize().y - 100) / m_height - 1;
 	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
 
 	auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight;
