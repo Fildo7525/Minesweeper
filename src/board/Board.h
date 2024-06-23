@@ -26,11 +26,14 @@ public:
 	void resetTimer() { m_start = nullptr; }
 	int &getDifficulty() { return m_difficulty; }
 	void setDifficulty(int difficulty);
+	void setOnlyDifficulty(int difficulty) { m_difficulty = difficulty; }
 	int totalNumberOfCells() const { return m_width * m_height; }
+	int &width() { return m_width; }
+	int &height() { return m_height; }
+	void setupEmptyTiles();
 
 private:
 
-	void setupEmptyTiles();
 	void initTiles(int x, int y);
 	bool isInRange(Pose pose, Pose generated, int range);
 	std::unordered_set<Pose> generateMinePositions(int x, int y);

@@ -14,4 +14,7 @@ private:
 	std::shared_ptr<Board> m_board;
 	int m_difficulty;
 	int m_numberOfMines;
+
+	int m_localHeight;
+	int m_localWidth;
 };
