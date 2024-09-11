@@ -102,6 +102,11 @@ void Board::render()
 						if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
 							m_numberOfFlags--;
 							unmarkMine(x, y);
+
+							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
+								m_gameOver = true;
+								setAllTilesClicked();
+							}
 						}
 					}
 					else {
@@ -129,7 +134,7 @@ void Board::render()
 						if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
 							m_numberOfFlags++;
 							markMine(x, y);
-							if (allMinesMarked()) {
+							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
 								m_gameOver = true;
 								setAllTilesClicked();
 							}
