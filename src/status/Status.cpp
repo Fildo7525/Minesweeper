@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+#define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 #define SCORE_FILE_NAME "scores.txt"
 
 Status::Status(std::shared_ptr<Board> &board)
@@ -25,10 +26,11 @@ Status::Status(std::shared_ptr<Board> &board)
 	}
 }
 
+static long score = 0;
 void Status::render()
 {
 	if (m_board->isGameOver() == Board::GameOverState::Win) {
-		long score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
+		score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
 		m_scores[score] = "User";
 	}
 
@@ -95,10 +97,18 @@ void Status::render()
 
 			ImGui::LabelText("Max score", "User name");
 
-			for (auto &score : m_scores) {
+			for (auto &localScore : m_scores) {
+				if (score == localScore.first) {
+					ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
+				}
+				else {
+					ImGui::PushStyleColor(ImGuiCol_Text, DEFAULT_COLOR);
+				}
+
 				char buf[32];
-				sprintf(buf, "%ld", score.first);
-				ImGui::LabelText(buf, "%s", score.second.c_str());
+				sprintf(buf, "%ld", localScore.first);
+				ImGui::LabelText(buf, "%s", localScore.second.c_str());
+				ImGui::PopStyleColor();
 			}
 
 			ImGui::EndChild();
