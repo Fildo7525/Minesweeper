@@ -15,7 +15,7 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_initialized(false)
 	, m_icons()
 	, m_minePositions(numberOfMines)
-	, m_gameOver(false)
+	, m_gameOver(GameOverState::Playing)
 	, m_width(width)
 	, m_height(height)
 	, m_numberOfMines(numberOfMines)
@@ -48,12 +48,14 @@ void SelectableColor(ImU32 color)
 
 void Board::render()
 {
-	if (m_gameOver || !isGamePlayable()) {
+	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
 
+		bool loose = false;
 		for (auto &row : m_tiles) {
 			for (auto &tile : row) {
 				if (tile.belongsToUs(m_icons[(int)Icon::Ocupant::Flag]) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
 					tile.setOcupant(m_icons[(int)Icon::Ocupant::WrongFlag]);
+					loose = true;
 				}
 				tile.click();
 			}
@@ -62,8 +64,9 @@ void Board::render()
 		ImGui::Begin("Game Over", NULL, m_windowFlags);
 		ImGui::Text("Game Over");
 		if (ImGui::Button("Play Again")) {
-			m_gameOver = false;
+			m_gameOver = GameOverState::Playing;
 			m_initialized = false;
+			m_numberOfClicks = 0;
 			m_numberOfFlags = 0;
 			resetTimer();
 
@@ -104,7 +107,7 @@ void Board::render()
 							unmarkMine(x, y);
 
 							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
-								m_gameOver = true;
+								m_gameOver = GameOverState::Win;
 								setAllTilesClicked();
 							}
 						}
@@ -113,6 +116,7 @@ void Board::render()
 						auto ocup = m_tiles[y][x].ocupant()->ocupation();
 						if (ocup != Icon::Ocupant::Flag && countSurroundingFlags(x, y) == (int)ocup) {
 							m_tiles[y][x].click(false);
+							m_numberOfClicks++;
 							clickPossibleTiles(x, y);
 						}
 					}
@@ -135,19 +139,21 @@ void Board::render()
 							m_numberOfFlags++;
 							markMine(x, y);
 							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
-								m_gameOver = true;
+								m_numberOfFlags++;
+								m_gameOver = GameOverState::Win;
 								setAllTilesClicked();
 							}
 						}
 
 						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
-							m_gameOver = true;
+							m_gameOver = GameOverState::Lose;
 							setAllTilesClicked();
 						}
 						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Empty) {
 							clickAllEmptyTiles(x, y);
 						}
 						m_tiles[y][x].click();
+						m_numberOfClicks++;
 					}
 				}
 				ImGui::PopStyleColor(2);
@@ -163,7 +169,7 @@ Board &Board::setNumberOfMines(int size)
 {
 	m_numberOfMines = size;
 	m_numberOfFlags = 0;
-	m_gameOver = false;
+	m_gameOver = GameOverState::Playing;
 	m_initialized = false;
 	for (auto &row : m_tiles) {
 		for (auto &tile : row) {
@@ -179,7 +185,7 @@ long Board::elapsedTime()
 		return -1;
 	}
 
-	if (!m_gameOver) {
+	if (m_gameOver == GameOverState::Playing) {
 		auto diff = std::chrono::steady_clock::now() - *m_start;
 		m_lastElapsedTime = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
 	}
@@ -190,7 +196,7 @@ long Board::elapsedTime()
 void Board::setDifficulty(int difficulty)
 {
 	m_difficulty = difficulty;
-	m_height = getSizeFromDifficulty();
+	m_height = sizeFromDifficulty();
 	m_width = m_height;
 	setupEmptyTiles();
 	setNumberOfMines((m_height*m_width) / 5);
@@ -214,6 +220,7 @@ void Board::setupEmptyTiles()
 void Board::initTiles(int X, int Y)
 {
 	m_minePositions = generateMinePositions(X, Y);
+	m_numberOfClicks = 0;
 
 	m_tiles.clear();
 	m_tiles.resize(m_height);
@@ -368,7 +375,7 @@ void Board::clickPossibleTiles(int x, int y)
 	m_tiles[y][x].click();
 
 	if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
-		m_gameOver = true;
+		m_gameOver = GameOverState::Lose;
 		return;
 	}
 
@@ -414,7 +421,7 @@ void Board::unmarkMine(int x, int y)
 	m_tiles[y][x].setOcupant(m_icons[cnt]).click(false);
 }
 
-int Board::getSizeFromDifficulty()
+int Board::sizeFromDifficulty()
 {
 	switch (m_difficulty) {
 		case 0:

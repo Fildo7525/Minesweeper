@@ -12,6 +12,13 @@ class Board
 	: public Layer
 {
 public:
+	enum class GameOverState
+	{
+		Playing,
+		Win,
+		Lose,
+	};
+
 	using time = std::chrono::time_point<std::chrono::steady_clock>;
 
 	using Tiles = std::vector<std::vector<Tile>>;
@@ -21,10 +28,11 @@ public:
 	Board &setNumberOfMines(int size);
 	int totalNumberOfMines() const { return m_numberOfMines; }
 	int numberOfFlags() const { return m_numberOfFlags; }
-	bool isGameOver() const { return m_gameOver; }
+	GameOverState isGameOver() const { return m_gameOver; }
 	long elapsedTime();
 	void resetTimer() { m_start = nullptr; }
-	int &getDifficulty() { return m_difficulty; }
+	const int &difficulty() const { return m_difficulty; }
+	const long &numberOfClicks() const { return m_numberOfClicks; }
 	void setDifficulty(int difficulty);
 	void setOnlyDifficulty(int difficulty) { m_difficulty = difficulty; }
 	int totalNumberOfCells() const { return m_width * m_height; }
@@ -53,7 +61,7 @@ private:
 	void markMine(int x, int y);
 	void unmarkMine(int x, int y);
 
-	int getSizeFromDifficulty();
+	int sizeFromDifficulty();
 	bool allMinesMarked();
 
 private:
@@ -61,7 +69,7 @@ private:
 	std::vector<Icon::Ptr> m_icons;
 	std::unordered_set<Pose> m_minePositions;
 	Tiles m_tiles;
-	bool m_gameOver;
+	GameOverState m_gameOver;
 	int m_width;
 	int m_height;
 	int m_numberOfMines;
@@ -69,5 +77,6 @@ private:
 	std::shared_ptr<time> m_start;
 	int m_difficulty;
 	long m_lastElapsedTime;
+	long m_numberOfClicks;
 };
 

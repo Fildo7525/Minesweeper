@@ -1,19 +1,37 @@
 #include "Status.h"
 #include "imgui.h"
+
 #include <algorithm>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+#define SCORE_FILE_NAME "scores.txt"
 
 Status::Status(std::shared_ptr<Board> &board)
 	: Layer("Status")
 	, m_board(board)
 	, m_difficulty(0)
 	, m_numberOfMines(board->totalNumberOfMines())
+	, m_scoreFile(SCORE_FILE_NAME, std::ios::in)
+	, m_scores()
 {
+	if (!m_scoreFile.is_open()) {
+		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
+	}
+
+	int score;
+	std::string name;
+	while (m_scoreFile >> score >> name) {
+		m_scores[score] = name;
+	}
 }
 
 void Status::render()
 {
+	if (m_board->isGameOver() == Board::GameOverState::Win) {
+		long score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
+		m_scores[score] = "User";
+	}
+
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
 
 	ImGui::Text("Mines: %d / %d", m_board->numberOfFlags(), m_board->totalNumberOfMines());
@@ -70,6 +88,22 @@ void Status::render()
 
 			ImGui::PopItemWidth();
 		}
+		{
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
+			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+			ImGui::BeginChild("ChildR", ImVec2(0, 260), ImGuiChildFlags_Border, window_flags);
+
+			ImGui::LabelText("Max score", "User name");
+
+			for (auto &score : m_scores) {
+				char buf[32];
+				sprintf(buf, "%ld", score.first);
+				ImGui::LabelText(buf, "%s", score.second.c_str());
+			}
+
+			ImGui::EndChild();
+			ImGui::PopStyleVar();
+		}
 	}
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
@@ -83,3 +117,15 @@ void Status::render()
 	ImGui::End();
 }
 
+Status::~Status()
+{
+	m_scoreFile.close();
+	m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
+
+	for (auto &score : m_scores) {
+		m_scoreFile << score.first << " " << score.second << '\n';
+	}
+
+	m_scoreFile.flush();
+	m_scoreFile.close();
+}
