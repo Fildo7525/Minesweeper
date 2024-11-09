@@ -91,6 +91,7 @@ void Status::render()
 			ImGui::PopItemWidth();
 		}
 		{
+			// TODO: Craete a table with 3 tabs: Easy, Medium, Hard
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
 			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 			ImGui::BeginChild("ChildR", ImVec2(0, 260), ImGuiChildFlags_Border, window_flags);

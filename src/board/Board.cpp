@@ -100,7 +100,8 @@ void Board::render()
 				setButtonColor(x, y);
 				ImVec2 size(buttonSize - 8, buttonSize - 6);
 
-				if (ImGui::ImageButton((void *)(intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
+				const std::string localID = std::to_string(y * m_tiles.front().size() + x);
+				if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
 					if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
 						if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
 							m_numberOfFlags--;
