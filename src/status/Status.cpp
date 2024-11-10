@@ -14,6 +14,7 @@ Status::Status(std::shared_ptr<Board> &board)
 	, m_numberOfMines(board->totalNumberOfMines())
 	, m_scoreFile(SCORE_FILE_NAME, std::ios::in)
 	, m_scores()
+	, m_name("User")
 {
 	if (!m_scoreFile.is_open()) {
 		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
@@ -24,6 +25,8 @@ Status::Status(std::shared_ptr<Board> &board)
 	while (m_scoreFile >> score >> name) {
 		m_scores[score] = name;
 	}
+
+	m_name.resize(32);
 }
 
 static long score = 0;
@@ -31,10 +34,12 @@ void Status::render()
 {
 	if (m_board->isGameOver() == Board::GameOverState::Win) {
 		score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
-		m_scores[score] = "User";
+		m_scores[score] = m_name;
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
+
+	ImGui::InputText("Player name", m_name.data(), 32);
 
 	ImGui::Text("Mines: %d / %d", m_board->numberOfFlags(), m_board->totalNumberOfMines());
 	auto time = m_board->elapsedTime();
@@ -96,20 +101,32 @@ void Status::render()
 			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 			ImGui::BeginChild("ChildR", ImVec2(0, 260), ImGuiChildFlags_Border, window_flags);
 
-			ImGui::LabelText("Max score", "User name");
+			static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+			if (ImGui::BeginTable("ScoreBoard", 2, flags)){
+				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+				ImGui::TableSetupColumn("Max score", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("User name", ImGuiTableColumnFlags_None);
+				ImGui::TableHeadersRow();
 
-			for (auto &localScore : m_scores) {
-				if (score == localScore.first) {
-					ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
-				}
-				else {
-					ImGui::PushStyleColor(ImGuiCol_Text, DEFAULT_COLOR);
-				}
+				for (auto &localScore : m_scores) {
+					ImGui::TableNextRow();
+					if (score == localScore.first) {
+						ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
+					}
+					else {
+						ImGui::PushStyleColor(ImGuiCol_Text, DEFAULT_COLOR);
+					}
 
-				char buf[32];
-				sprintf(buf, "%ld", localScore.first);
-				ImGui::LabelText(buf, "%s", localScore.second.c_str());
-				ImGui::PopStyleColor();
+					char buf[32];
+					sprintf(buf, "%ld", localScore.first);
+					for (int column = 0; column < 2; column++) {
+						ImGui::TableSetColumnIndex(column);
+						ImGui::Text((column == 1 ? std::to_string(localScore.first).c_str() : localScore.second.c_str()));
+					}
+
+					ImGui::PopStyleColor();
+				}
+				ImGui::EndTable();
 			}
 
 			ImGui::EndChild();

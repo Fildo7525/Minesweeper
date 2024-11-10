@@ -25,4 +25,5 @@ private:
 	int m_localWidth;
 	std::fstream m_scoreFile;
 	std::map<long, std::string, std::greater<long>> m_scores;
+	std::string m_name;
 };
