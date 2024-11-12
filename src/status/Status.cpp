@@ -10,6 +10,9 @@
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 #define SCORE_FILE_NAME "scores.txt"
 #define COLUMN_SIZE 2
+#define INDENT_CUSTOM_SIZE 25
+#define MAX_SIZE 30
+#define MIN_SIZE 9
 
 Status::Status(std::shared_ptr<Board> &board)
 	: Layer("Status")
@@ -72,25 +75,27 @@ void Status::render()
 		float statusWidth = ImGui::GetWindowWidth();
 		ImGui::PushItemWidth(statusWidth / 4.);
 
-		if (ImGui::InputInt("Width", &m_localWidth)) { }
+		ImGui::Indent(INDENT_CUSTOM_SIZE);
+		if (ImGui::InputInt("Width", &m_localWidth))
+			m_localWidth = std::clamp(m_localWidth, MIN_SIZE, MAX_SIZE);
 
-		ImGui::SameLine();
-		if (ImGui::InputInt("Height", &m_localHeight)) { }
+		/* ImGui::SameLine(); */
+		if (ImGui::InputInt("Height", &m_localHeight))
+			m_localHeight = std::clamp(m_localHeight, MIN_SIZE, MAX_SIZE);
 
-		ImGui::SameLine();
+		/* ImGui::SameLine(); */
 		if (ImGui::Button("Apply")) {
 
 			// Limit the width and height
-			m_board->width() = std::clamp(m_localWidth, 9, 30);
-			m_board->height() = std::clamp(m_localHeight, 9, 30);
-			m_localHeight = m_board->height();
-			m_localWidth = m_board->width();
+			m_board->width() = m_localWidth;
+			m_board->height() = m_localHeight;
 
 			m_board->setupEmptyTiles();
 			m_numberOfMines = (m_localWidth * m_localHeight) / 5;
 			m_board->setNumberOfMines(m_numberOfMines);
 			m_board->resetTimer();
 		}
+		ImGui::Unindent(INDENT_CUSTOM_SIZE);
 
 		ImGui::PopItemWidth();
 	}
