@@ -5,6 +5,8 @@
 #include <fstream>
 #include <map>
 
+using DifficultyTab = std::map<long, std::string, std::greater<long>>;
+
 class Status
 	: public Layer
 {
@@ -17,6 +19,12 @@ public:
 	~Status();
 
 private:
+	std::string difficultyString(int difficulty = -1) const;
+	void createTabTable(int difficulty = -1);
+	std::vector<std::string> split(const std::string &s, char delim);
+	void loadScoreFile();
+
+private:
 	std::shared_ptr<Board> m_board;
 	int m_difficulty;
 	int m_numberOfMines;
@@ -24,6 +32,6 @@ private:
 	int m_localHeight;
 	int m_localWidth;
 	std::fstream m_scoreFile;
-	std::map<long, std::string, std::greater<long>> m_scores;
+	std::map<long, DifficultyTab> m_scores;
 	std::string m_name;
 };
