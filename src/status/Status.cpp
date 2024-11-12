@@ -1,5 +1,6 @@
 #include "Status.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include <algorithm>
 #include <string>
@@ -27,12 +28,11 @@ Status::Status(std::shared_ptr<Board> &board)
 	m_name.resize(32);
 }
 
-static long score = 0;
 void Status::render()
 {
 	if (m_board->isGameOver() == Board::GameOverState::Win) {
-		score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
-		m_scores[m_difficulty].insert({score, m_name});
+		m_score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
+		m_scores[m_difficulty].insert({m_score, m_name});
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
@@ -176,7 +176,7 @@ void Status::createTabTable(int difficulty)
 
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
-		if (score == diffGrade.first && difficulty == m_difficulty && m_name == diffGrade.second) {
+		if (m_score == diffGrade.first && difficulty == m_difficulty && m_name == diffGrade.second) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
 		else {
