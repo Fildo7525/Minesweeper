@@ -169,7 +169,13 @@ std::string Status::difficultyString(int difficulty) const
 
 void Status::createTabTable(int difficulty)
 {
-	static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+	static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY
+		| ImGuiTableFlags_BordersOuter
+		| ImGuiTableFlags_BordersV
+		| ImGuiTableFlags_Hideable
+		| ImGuiTableFlags_Reorderable
+		| ImGuiTableFlags_Resizable
+		| ImGuiTableFlags_RowBg;
 
 	std::string tableID = "ScoreBoard" + std::to_string(difficulty);
 	if (!ImGui::BeginTable(tableID.c_str(), COLUMN_SIZE, flags))
