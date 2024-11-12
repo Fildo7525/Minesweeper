@@ -50,12 +50,10 @@ void Board::render()
 {
 	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
 
-		bool loose = false;
 		for (auto &row : m_tiles) {
 			for (auto &tile : row) {
 				if (tile.belongsToUs(m_icons[(int)Icon::Ocupant::Flag]) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
 					tile.setOcupant(m_icons[(int)Icon::Ocupant::WrongFlag]);
-					loose = true;
 				}
 				tile.click();
 			}
