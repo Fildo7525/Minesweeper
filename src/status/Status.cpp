@@ -31,8 +31,10 @@ Status::Status(std::shared_ptr<Board> &board)
 void Status::render()
 {
 	if (m_board->isGameOver() == Board::GameOverState::Win) {
-		m_score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
-		m_scores[m_difficulty].insert({m_score, m_name});
+		m_score.score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
+		m_score.name = m_name;
+		m_score.difficulty = m_difficulty;
+		m_scores[m_difficulty].insert({m_score.score, m_score.name});
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
@@ -170,12 +172,12 @@ void Status::createTabTable(int difficulty)
 
 	ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 	ImGui::TableSetupColumn("User name");
-	ImGui::TableSetupColumn("Max score");
+	ImGui::TableSetupColumn("Score");
 	ImGui::TableHeadersRow();
 
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
-		if (m_score == diffGrade.first && difficulty == m_difficulty && m_name == diffGrade.second) {
+		if (m_score.score == diffGrade.first && difficulty == m_score.difficulty && m_score.name == diffGrade.second) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
 		else {

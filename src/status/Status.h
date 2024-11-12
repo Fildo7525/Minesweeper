@@ -10,6 +10,12 @@ using DifficultyTab = std::map<long, std::string, std::greater<long>>;
 class Status
 	: public Layer
 {
+	struct ScoreRecord {
+		long difficulty;
+		long score;
+		std::string name;
+	};
+
 public:
 	explicit Status(std::shared_ptr<Board> &board);
 	void render() override;
@@ -28,7 +34,7 @@ private:
 	std::shared_ptr<Board> m_board;
 	int m_difficulty;
 	int m_numberOfMines;
-	long m_score;
+	ScoreRecord m_score;
 
 	int m_localHeight;
 	int m_localWidth;
