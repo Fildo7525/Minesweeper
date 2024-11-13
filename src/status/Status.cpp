@@ -38,7 +38,11 @@ void Status::render()
 		m_score.score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
 		m_score.name = m_name;
 		m_score.difficulty = m_difficulty;
-		m_scores[m_difficulty].insert({m_score.score, m_score.name});
+		m_score.width = m_localWidth;
+		m_score.height = m_localHeight;
+		m_score.numberOfMines = m_numberOfMines;
+
+		m_scores[m_difficulty].insert({m_score.score, m_score});
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
@@ -151,9 +155,19 @@ Status::~Status()
 	for (auto &score : m_scores) {
 		// Printing difficulty
 		m_scoreFile << score.first << '\n';
-		for (auto &name : score.second)
+		for (auto &record : score.second) {
 			// printing score and name
-			m_scoreFile << name.first << " " << name.second << '\n';
+			m_scoreFile << record.first << " " << record.second.name;
+
+			if (score.first == CUSTOM_DIFFICULTY) {
+				// printing width and height
+				m_scoreFile << " " << record.second.width << " " << record.second.height;
+				// printing number of mines
+				m_scoreFile << " " << record.second.numberOfMines;
+			}
+
+			m_scoreFile << '\n';
+		}
 	}
 
 	m_scoreFile.flush();
@@ -204,7 +218,7 @@ void Status::createTabTable(int difficulty)
 
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
-		if (m_score.score == diffGrade.first && difficulty == m_score.difficulty && m_score.name == diffGrade.second) {
+		if (m_score.score == diffGrade.first && difficulty == m_score.difficulty && m_score.name == diffGrade.second.name) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
 		else {
@@ -215,16 +229,16 @@ void Status::createTabTable(int difficulty)
 			ImGui::TableSetColumnIndex(column);
 			switch (column) {
 			case 0:
-				ImGui::Text("%s", diffGrade.second.c_str());
+				ImGui::Text("%s", diffGrade.second.name.c_str());
 				break;
 			case 1:
 				ImGui::Text("%ld", diffGrade.first);
 				break;
 			case 2:
-				ImGui::Text("%dx%d", m_localWidth, m_localHeight);
+				ImGui::Text("%dx%d", diffGrade.second.width, diffGrade.second.height);
 				break;
 			case 3:
-				ImGui::Text("%d", m_numberOfMines);
+				ImGui::Text("%d", diffGrade.second.numberOfMines);
 				break;
 			}
 		}
@@ -262,8 +276,17 @@ void Status::loadScoreFile()
 		}
 
 		score = std::stoi(parts[0]);
-		line = parts[1];
-		m_scores[difficulty].insert({score, line});
+		ScoreRecord record {
+			.score = score,
+			.name = parts[1],
+		};
+		if (difficulty == CUSTOM_DIFFICULTY) {
+			record.width = std::stoi(parts[2]);
+			record.height = std::stoi(parts[3]);
+			record.numberOfMines = std::stoi(parts[4]);
+		}
+
+		m_scores[difficulty].insert({score, record});
 	}
 }
 

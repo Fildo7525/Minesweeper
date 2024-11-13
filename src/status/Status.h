@@ -5,17 +5,20 @@
 #include <fstream>
 #include <map>
 
-using DifficultyTab = std::map<long, std::string, std::greater<long>>;
+struct ScoreRecord {
+	long difficulty;
+	long score;
+	std::string name;
+	int width;
+	int height;
+	int numberOfMines;
+};
+
+using DifficultyTab = std::map<long, ScoreRecord, std::greater<long>>;
 
 class Status
 	: public Layer
 {
-	struct ScoreRecord {
-		long difficulty;
-		long score;
-		std::string name;
-	};
-
 public:
 	explicit Status(std::shared_ptr<Board> &board);
 	void render() override;
