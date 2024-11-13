@@ -14,6 +14,9 @@ struct ScoreRecord {
 	int numberOfMines;
 };
 
+// TODO: Use priority queue sorted by ScoreRecord.score instead of map.
+// This will result into more versatile solution that can be used
+// for different sorting orders.
 using DifficultyTab = std::map<long, ScoreRecord, std::greater<long>>;
 
 class Status

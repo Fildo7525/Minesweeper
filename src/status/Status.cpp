@@ -218,6 +218,8 @@ void Status::createTabTable(int difficulty)
 
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
+
+		// TODO: Add operator== to ScoreRecord
 		if (m_score.score == diffGrade.first && difficulty == m_score.difficulty && m_score.name == diffGrade.second.name) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
