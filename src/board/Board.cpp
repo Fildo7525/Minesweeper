@@ -51,14 +51,14 @@ void SelectableColor(ImU32 color)
 void Board::render()
 {
 	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
-		for (auto &row : m_tiles) {
+		std::for_each(std::execution::par_unseq, m_tiles.begin(), m_tiles.end(), [&](auto &row) {
 			for (auto &tile : row) {
 				if (tile.belongsToUs(m_icons[(int)Icon::Ocupant::Flag]) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
 					tile.setOcupant(m_icons[(int)Icon::Ocupant::WrongFlag]);
 				}
 				tile.click();
 			}
-		}
+		});
 	}
 
 
