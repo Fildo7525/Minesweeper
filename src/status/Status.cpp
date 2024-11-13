@@ -54,22 +54,21 @@ void Status::render()
 		ImGui::Text("Elapsed time: %2ld:%ld", minutes, time%60);
 	}
 
-	if (ImGui::RadioButton("Easy", &m_difficulty, 0)) {
-		m_board->setDifficulty(0);
+	for (int i = 0; i <= CUSTOM_DIFFICULTY; i++) {
+		if (not ImGui::RadioButton(difficultyString(i).c_str(), &m_difficulty, i)) {
+			continue;
+		}
+
 		m_numberOfMines = m_board->totalNumberOfMines();
-	}
-	if (ImGui::RadioButton("Medium", &m_difficulty, 1)) {
-		m_board->setDifficulty(1);
-		m_numberOfMines = m_board->totalNumberOfMines();
-	}
-	if (ImGui::RadioButton("Hard", &m_difficulty, 2)) {
-		m_board->setDifficulty(2);
-		m_numberOfMines = m_board->totalNumberOfMines();
-	}
-	if (ImGui::RadioButton("Custom", &m_difficulty, 3)) {
-		m_board->setOnlyDifficulty(3);
-		m_localHeight = m_board->height();
-		m_localWidth = m_board->width();
+
+		if (m_difficulty != CUSTOM_DIFFICULTY) {
+			m_board->setDifficulty(i);
+		}
+		else {
+			m_board->setOnlyDifficulty(i);
+			m_localHeight = m_board->height();
+			m_localWidth = m_board->width();
+		}
 	}
 	if (m_difficulty == 3) {
 		float statusWidth = ImGui::GetWindowWidth();
