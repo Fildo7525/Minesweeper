@@ -3,6 +3,8 @@
 
 #include "imgui.h"
 
+#include <algorithm>
+#include <execution>
 #include <random>
 
 bool operator==(const Pose &lhs, const Pose &rhs)
@@ -49,7 +51,6 @@ void SelectableColor(ImU32 color)
 void Board::render()
 {
 	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
-
 		for (auto &row : m_tiles) {
 			for (auto &tile : row) {
 				if (tile.belongsToUs(m_icons[(int)Icon::Ocupant::Flag]) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
@@ -58,23 +59,6 @@ void Board::render()
 				tile.click();
 			}
 		}
-
-		ImGui::Begin("Game Over", NULL, m_windowFlags);
-		ImGui::Text("Game Over");
-		if (ImGui::Button("Play Again")) {
-			m_gameOver = GameOverState::Playing;
-			m_initialized = false;
-			m_numberOfClicks = 0;
-			m_numberOfFlags = 0;
-			resetTimer();
-
-			for (auto &row : m_tiles) {
-				for (auto &tile : row) {
-					tile.click(false);
-				}
-			}
-		}
-		ImGui::End();
 	}
 
 
@@ -214,6 +198,21 @@ void Board::setupEmptyTiles()
 		}
 		m_tiles[y] = row;
 	}
+}
+
+void Board::on_refreshBoard_activated()
+{
+	m_gameOver = GameOverState::Playing;
+	m_initialized = false;
+	m_numberOfClicks = 0;
+	m_numberOfFlags = 0;
+	resetTimer();
+
+	std::for_each(std::execution::par_unseq, m_tiles.begin(),  m_tiles.end(), [](auto &row) {
+		for (auto &tile : row) {
+			tile.click(false);
+		}
+	});
 }
 
 void Board::initTiles(int X, int Y)

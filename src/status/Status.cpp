@@ -129,6 +129,16 @@ void Status::render()
 		ImGui::PopStyleVar();
 	}
 
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.01f, 1, 1));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.01f, 0.64f,0.78f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.01f, 1, 0.5f));
+
+	if (ImGui::Button("Play again", ImVec2(ImGui::GetWindowWidth(), 0))) {
+		m_board->on_refreshBoard_activated();
+	}
+
+	ImGui::PopStyleColor(3);
+
 	ImGui::End();
 }
 

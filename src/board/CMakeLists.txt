@@ -17,5 +17,6 @@ target_link_libraries(
 PUBLIC
 	app
 	image
+	tbb
 )
 

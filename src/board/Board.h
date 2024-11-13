@@ -40,6 +40,8 @@ public:
 	int &height() { return m_height; }
 	void setupEmptyTiles();
 
+	void on_refreshBoard_activated();
+
 private:
 
 	void initTiles(int x, int y);
