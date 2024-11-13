@@ -9,10 +9,11 @@
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 #define SCORE_FILE_NAME "scores.txt"
-#define COLUMN_SIZE 2
 #define INDENT_CUSTOM_SIZE 25
 #define MAX_SIZE 30
 #define MIN_SIZE 9
+#define CUSTOM_DIFFICULTY 3
+#define COLUMN_SIZE(dif) (dif == CUSTOM_DIFFICULTY ? 4 : 2)
 
 Status::Status(std::shared_ptr<Board> &board)
 	: Layer("Status")
@@ -187,12 +188,18 @@ void Status::createTabTable(int difficulty)
 		| ImGuiTableFlags_RowBg;
 
 	std::string tableID = "ScoreBoard" + std::to_string(difficulty);
-	if (!ImGui::BeginTable(tableID.c_str(), COLUMN_SIZE, flags))
+	if (!ImGui::BeginTable(tableID.c_str(), COLUMN_SIZE(difficulty), flags))
 		return;
 
 	ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 	ImGui::TableSetupColumn("User name");
 	ImGui::TableSetupColumn("Score");
+
+	if (difficulty == CUSTOM_DIFFICULTY) {
+		ImGui::TableSetupColumn("Size");
+		ImGui::TableSetupColumn("Mines");
+	}
+
 	ImGui::TableHeadersRow();
 
 	for (auto &diffGrade : m_scores[difficulty]) {
@@ -204,9 +211,22 @@ void Status::createTabTable(int difficulty)
 			ImGui::PushStyleColor(ImGuiCol_Text, DEFAULT_COLOR);
 		}
 
-		for (int column = 0; column < 2; column++) {
+		for (int column = 0; column < COLUMN_SIZE(difficulty); column++) {
 			ImGui::TableSetColumnIndex(column);
-			ImGui::Text("%s", (column == 1 ? std::to_string(diffGrade.first).c_str() : diffGrade.second.c_str()));
+			switch (column) {
+			case 0:
+				ImGui::Text("%s", diffGrade.second.c_str());
+				break;
+			case 1:
+				ImGui::Text("%ld", diffGrade.first);
+				break;
+			case 2:
+				ImGui::Text("%dx%d", m_localWidth, m_localHeight);
+				break;
+			case 3:
+				ImGui::Text("%d", m_numberOfMines);
+				break;
+			}
 		}
 
 		ImGui::PopStyleColor();
