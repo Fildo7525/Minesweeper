@@ -79,67 +79,10 @@ void Board::render()
 
 			ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)m_tiles[y][x].color());
 			if (m_tiles[y][x].clicked()) {
-				setButtonColor(x, y);
-				ImVec2 size(buttonSize - 8, buttonSize - 6);
-
-				const std::string localID = std::to_string(y * m_tiles.front().size() + x);
-				if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
-					if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-						if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
-							m_numberOfFlags--;
-							unmarkMine(x, y);
-
-							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
-								m_gameOver = GameOverState::Win;
-								setAllTilesClicked();
-							}
-						}
-					}
-					else {
-						auto ocup = m_tiles[y][x].ocupant()->ocupation();
-						if (ocup != Icon::Ocupant::Flag && countSurroundingFlags(x, y) == (int)ocup) {
-							m_tiles[y][x].click(false);
-							m_numberOfClicks++;
-							clickPossibleTiles(x, y);
-						}
-					}
-				}
-
-				ImGui::PopStyleColor(2);
+				handleClickedTile(buttonSize, x, y, buttonFlags);
 			}
 			else {
-				setButtonColor(x, y);
-				ImVec2 size(buttonSize, buttonSize);
-
-				if (ImGui::Button("", size, buttonFlags )) {
-					if (isTilePlayable(x, y)) {
-						if (!m_initialized) {
-							initTiles(x, y);
-							m_start = std::make_shared<time>(std::chrono::steady_clock::now());
-						}
-
-						if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-							m_numberOfFlags++;
-							markMine(x, y);
-							if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
-								m_numberOfFlags++;
-								m_gameOver = GameOverState::Win;
-								setAllTilesClicked();
-							}
-						}
-
-						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
-							m_gameOver = GameOverState::Lose;
-							setAllTilesClicked();
-						}
-						else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Empty) {
-							clickAllEmptyTiles(x, y);
-						}
-						m_tiles[y][x].click();
-						m_numberOfClicks++;
-					}
-				}
-				ImGui::PopStyleColor(2);
+				handleUnclickedTile(buttonSize, x, y, buttonFlags);
 			}
 			ImGui::PopStyleColor(1);
 			ImGui::PopID();
@@ -441,4 +384,72 @@ bool Board::allMinesMarked()
 		}
 	}
 	return true;
+}
+
+void Board::handleUnclickedTile(int buttonSize, int x, int y, int buttonFlags)
+{
+	setButtonColor(x, y);
+	ImVec2 size(buttonSize, buttonSize);
+
+	if (ImGui::Button("", size, buttonFlags )) {
+		if (isTilePlayable(x, y)) {
+			if (!m_initialized) {
+				initTiles(x, y);
+				m_start = std::make_shared<time>(std::chrono::steady_clock::now());
+			}
+
+			if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+				m_numberOfFlags++;
+				markMine(x, y);
+				if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
+					m_numberOfFlags++;
+					m_gameOver = GameOverState::Win;
+					setAllTilesClicked();
+				}
+			}
+
+			else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
+				m_gameOver = GameOverState::Lose;
+				setAllTilesClicked();
+			}
+			else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Empty) {
+				clickAllEmptyTiles(x, y);
+			}
+			m_tiles[y][x].click();
+			m_numberOfClicks++;
+		}
+	}
+	ImGui::PopStyleColor(2);
+
+}
+
+void Board::handleClickedTile(int buttonSize, int x, int y, int buttonFlags)
+{
+	setButtonColor(x, y);
+	ImVec2 size(buttonSize - 8, buttonSize - 6);
+
+	const std::string localID = std::to_string(y * m_tiles.front().size() + x);
+	if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+			if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+				m_numberOfFlags--;
+				unmarkMine(x, y);
+
+				if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
+					m_gameOver = GameOverState::Win;
+					setAllTilesClicked();
+				}
+			}
+		}
+		else {
+			auto ocup = m_tiles[y][x].ocupant()->ocupation();
+			if (ocup != Icon::Ocupant::Flag && countSurroundingFlags(x, y) == (int)ocup) {
+				m_tiles[y][x].click(false);
+				m_numberOfClicks++;
+				clickPossibleTiles(x, y);
+			}
+		}
+	}
+
+	ImGui::PopStyleColor(2);
 }

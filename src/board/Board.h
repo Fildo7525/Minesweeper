@@ -66,6 +66,9 @@ private:
 	int sizeFromDifficulty();
 	bool allMinesMarked();
 
+	void handleUnclickedTile(int buttonSize, int x, int y, int buttonFlags);
+	void handleClickedTile(int buttonSize, int x, int y, int buttonFlags);
+
 private:
 	bool m_initialized;
 	std::vector<Icon::Ptr> m_icons;
