@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Icon.h"
+#include "IconPool.h"
 
 #include "imgui.h"
+#include "Icon.h"
 
 #include <memory>
+#include <vector>
 
 struct Pose {
 	int x;
@@ -26,27 +28,29 @@ namespace std
 	};
 }
 
-
 class Tile
 {
 public:
-	explicit Tile(std::shared_ptr<Icon> ocupant, Pose position, bool clicked = false);
+	explicit Tile(Icon::Ocupant ocupant, Pose position, bool clicked = false);
 
-	bool belongsToOponent(const std::shared_ptr<Icon> &player) const;
-	bool belongsToUs(const std::shared_ptr<Icon> &player) const;
+	bool belongsToOponent(const Icon::Ocupant &player) const;
+	bool belongsToUs(const Icon::Ocupant &player) const;
 
-	Tile &setOcupant(const std::shared_ptr<Icon> &ocupant) { m_ocupant = ocupant; return *this; }
+	Tile &setOcupant(const Icon::Ocupant &ocupant) { m_ocupant = ocupant; return *this; }
 
 	Pose position() const { return m_position; }
 	bool clicked() const { return m_clicked; }
-	Tile &click(bool c = true) { m_clicked = c; return *this; }
+	Tile &click(bool c = true); //{}
 
 	ImColor color() const;
-	bool selected() const { return m_ocupant->ocupation() != Icon::Ocupant::Empty; }
-	std::shared_ptr<Icon> ocupant() const;
+	bool selected() const { return m_ocupant != Icon::Ocupant::Empty; }
+	Icon::Ocupant ocupant() const;
+	std::shared_ptr<Icon> icon() const { return m_icons[(int)m_ocupant]; }
+
 private:
+
 	ImColor m_color;
-	std::shared_ptr<Icon> m_ocupant;
+	Icon::Ocupant m_ocupant;
 	bool m_clicked;
 	Pose m_position;
 };

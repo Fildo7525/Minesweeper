@@ -29,6 +29,7 @@ public:
 	GLuint texture();
 	int textureWidth() const { return m_width; }
 	int textureHeight() const { return m_height; }
+	std::string texturePath() const { return m_texturePath; }
 
 private:
 	Ocupant m_ocupation;

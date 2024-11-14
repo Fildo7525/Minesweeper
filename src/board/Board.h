@@ -71,7 +71,6 @@ private:
 
 private:
 	bool m_initialized;
-	std::vector<Icon::Ptr> m_icons;
 	std::unordered_set<Pose> m_minePositions;
 	Tiles m_tiles;
 	GameOverState m_gameOver;

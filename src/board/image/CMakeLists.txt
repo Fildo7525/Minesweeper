@@ -4,6 +4,8 @@ add_library(${libname}
 STATIC
 	Icon.cpp
 	Icon.h
+	IconPool.cpp
+	IconPool.h
 	Image.cpp
 	Image.h
 )

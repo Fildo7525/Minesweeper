@@ -107,7 +107,7 @@ void Status::render()
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
 	if (ImGui::InputInt("Mines", &m_numberOfMines)) {
-		m_numberOfMines = std::clamp(m_numberOfMines, 1, m_board->totalNumberOfCells()-9);
+		m_numberOfMines = std::clamp(m_numberOfMines, 5, m_board->totalNumberOfCells()-9);
 		m_board->setNumberOfMines(m_numberOfMines);
 		m_board->resetTimer();
 	}

@@ -1,6 +1,5 @@
 #include "Icon.h"
 #include "Image.h"
-#include "imgui.h"
 
 Icon::Icon(Ocupant ocupation, const std::string &texturePath, int width, int height)
 	: m_ocupation(ocupation)

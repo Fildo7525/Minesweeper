@@ -1,6 +1,6 @@
 #include "Board.h"
-#include "Icon.h"
 
+#include "IconPool.h"
 #include "imgui.h"
 
 #include <algorithm>
@@ -15,7 +15,6 @@ bool operator==(const Pose &lhs, const Pose &rhs)
 Board::Board(int width, int height, int numberOfMines)
 	: Layer("Board")
 	, m_initialized(false)
-	, m_icons()
 	, m_minePositions(numberOfMines)
 	, m_gameOver(GameOverState::Playing)
 	, m_width(width)
@@ -25,19 +24,7 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_start(nullptr)
 	, m_difficulty(0)
 {
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::One, "../images/one.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Two, "../images/two.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Three, "../images/three.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Four, "../images/four.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Five, "../images/five.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Six, "../images/six.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Seven, "../images/seven.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Eight, "../images/eight.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Mine, "../images/mine_icon.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::Flag, "../images/mine_flag.png", 10, 10));
-	m_icons.push_back(std::make_shared<Icon>(Icon::Ocupant::WrongFlag, "../images/mine_wrong_flag.png", 10, 10));
-
+	loadIcons();
 	setupEmptyTiles();
 }
 
@@ -53,8 +40,8 @@ void Board::render()
 	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
 		std::for_each(std::execution::par_unseq, m_tiles.begin(), m_tiles.end(), [&](auto &row) {
 			for (auto &tile : row) {
-				if (tile.belongsToUs(m_icons[(int)Icon::Ocupant::Flag]) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
-					tile.setOcupant(m_icons[(int)Icon::Ocupant::WrongFlag]);
+				if (tile.belongsToUs(Icon::Ocupant::Flag) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
+					tile.setOcupant(Icon::Ocupant::WrongFlag);
 				}
 				tile.click();
 			}
@@ -63,8 +50,8 @@ void Board::render()
 
 
 	ImGui::Begin("Board", NULL, m_windowFlags);
-	int buttonWidth = (ImGui::GetWindowSize().x - 80) / m_width - 1;
-	int buttonHeight = (ImGui::GetWindowSize().y - 100) / m_height - 1;
+	int buttonWidth = (ImGui::GetWindowSize().x - 80) / (m_width + 1);
+	int buttonHeight = (ImGui::GetWindowSize().y - 100) / (m_height + 1);
 	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
 
 	auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight;
@@ -136,8 +123,7 @@ void Board::setupEmptyTiles()
 	for (int y = 0; y < m_height; y++) {
 		std::vector<Tile> row;
 		for (int x = 0; x < m_width; x++) {
-			int cnt = countSurroundingMines(x, y);
-			row.emplace_back(Tile(m_icons[0], {x,y}));
+			row.emplace_back(Tile(Icon::Ocupant::Empty, {x,y}));
 		}
 		m_tiles[y] = row;
 	}
@@ -168,10 +154,8 @@ void Board::initTiles(int X, int Y)
 	for (int y = 0; y < m_height; y++) {
 		std::vector<Tile> row;
 		for (int x = 0; x < m_width; x++) {
-			int cnt = countSurroundingMines(x, y);
-			Icon::Ptr icon = m_icons[cnt];
-
-			row.emplace_back(Tile(icon, {x, y}));
+			auto ocupant = (Icon::Ocupant)countSurroundingMines(x, y);
+			row.emplace_back(Tile(ocupant, {x, y}));
 		}
 		m_tiles[y] = row;
 	}
@@ -228,7 +212,7 @@ int Board::countSurroundingMines(int x, int y)
 int Board::countSurroundingFlags(int x, int y)
 {
 	int count = 0;
-	if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+	if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
 		return 9;
 	}
 
@@ -237,7 +221,7 @@ int Board::countSurroundingFlags(int x, int y)
 			if (!tileExists(x + j, y + i)) {
 				continue;
 			}
-			if (m_tiles[y + i][x + j].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+			if (m_tiles[y + i][x + j].belongsToUs(Icon::Ocupant::Flag)) {
 				count++;
 			}
 		}
@@ -315,12 +299,12 @@ void Board::clickPossibleTiles(int x, int y)
 
 	m_tiles[y][x].click();
 
-	if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
+	if (m_tiles[y][x].ocupant() == Icon::Ocupant::Mine) {
 		m_gameOver = GameOverState::Lose;
 		return;
 	}
 
-	if (countSurroundingFlags(x, y) != (int)m_tiles[y][x].ocupant()->ocupation()) {
+	if (countSurroundingFlags(x, y) != (int)m_tiles[y][x].ocupant()) {
 		return;
 	}
 	for (int i = -1; i < 2; i++) {
@@ -335,7 +319,7 @@ void Board::setAllTilesClicked()
 	for(int y = 0; y < m_height; y++) {
 		for(int x = 0; x < m_height; x++) {
 			if (m_minePositions.find({x, y}) == m_minePositions.end()) {
-				if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+				if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
 					unmarkMine(x, y);
 				}
 			}
@@ -346,20 +330,20 @@ void Board::setAllTilesClicked()
 
 void Board::markMine(int x, int y)
 {
-	m_tiles[y][x].setOcupant(m_icons[(int)Icon::Ocupant::Flag]).click();
+	m_tiles[y][x].setOcupant(Icon::Ocupant::Flag).click();
 }
 
 void Board::unmarkMine(int x, int y)
 {
 	for(auto &position : m_minePositions) {
 		if (position.x == x && position.y == y) {
-			m_tiles[y][x].setOcupant(m_icons[(int)Icon::Ocupant::Mine]).click(false);
+			m_tiles[y][x].setOcupant(Icon::Ocupant::Mine).click(false);
 			return;
 		}
 	}
 
-	int cnt = countSurroundingMines(x, y);
-	m_tiles[y][x].setOcupant(m_icons[cnt]).click(false);
+	Icon::Ocupant cnt = (Icon::Ocupant)countSurroundingMines(x, y);
+	m_tiles[y][x].setOcupant(cnt).click(false);
 }
 
 int Board::sizeFromDifficulty()
@@ -379,7 +363,7 @@ int Board::sizeFromDifficulty()
 bool Board::allMinesMarked()
 {
 	for (auto &position : m_minePositions) {
-		if (!m_tiles[position.y][position.x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+		if (!m_tiles[position.y][position.x].belongsToUs(Icon::Ocupant::Flag)) {
 			return false;
 		}
 	}
@@ -407,14 +391,14 @@ void Board::handleUnclickedTile(int buttonSize, int x, int y, int buttonFlags)
 					setAllTilesClicked();
 				}
 			}
-
-			else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Mine) {
+			else if (m_tiles[y][x].ocupant() == Icon::Ocupant::Mine) {
 				m_gameOver = GameOverState::Lose;
 				setAllTilesClicked();
 			}
-			else if (m_tiles[y][x].ocupant()->ocupation() == Icon::Ocupant::Empty) {
+			else if (m_tiles[y][x].ocupant() == Icon::Ocupant::Empty) {
 				clickAllEmptyTiles(x, y);
 			}
+
 			m_tiles[y][x].click();
 			m_numberOfClicks++;
 		}
@@ -429,9 +413,9 @@ void Board::handleClickedTile(int buttonSize, int x, int y, int buttonFlags)
 	ImVec2 size(buttonSize - 8, buttonSize - 6);
 
 	const std::string localID = std::to_string(y * m_tiles.front().size() + x);
-	if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].ocupant()->texture(), size, buttonFlags)) {
+	if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].icon()->texture(), size, buttonFlags)) {
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-			if (m_tiles[y][x].belongsToUs(m_icons[(int)Icon::Ocupant::Flag])) {
+			if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
 				m_numberOfFlags--;
 				unmarkMine(x, y);
 
@@ -441,8 +425,8 @@ void Board::handleClickedTile(int buttonSize, int x, int y, int buttonFlags)
 				}
 			}
 		}
-		else {
-			auto ocup = m_tiles[y][x].ocupant()->ocupation();
+		else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+			auto ocup = m_tiles[y][x].ocupant();
 			if (ocup != Icon::Ocupant::Flag && countSurroundingFlags(x, y) == (int)ocup) {
 				m_tiles[y][x].click(false);
 				m_numberOfClicks++;
