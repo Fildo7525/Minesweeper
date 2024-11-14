@@ -220,8 +220,7 @@ void Status::createTabTable(int difficulty)
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
 
-		// TODO: Add operator== to ScoreRecord
-		if (m_score.score == diffGrade.first && difficulty == m_score.difficulty && m_score.name == diffGrade.second.name) {
+		if (m_score == diffGrade.second) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
 		else {
@@ -293,3 +292,7 @@ void Status::loadScoreFile()
 	}
 }
 
+bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs)
+{
+	return lhs.score == rhs.score && lhs.difficulty == rhs.difficulty && lhs.name == rhs.name;
+}

@@ -24,6 +24,8 @@ public:
 		WrongFlag
 	};
 
+	static std::string ocupantString(Ocupant ocupant);
+
 	explicit Icon(Ocupant ocupation, const std::string &texturePath, int width, int height);
 	Ocupant ocupation() const;
 	GLuint texture();

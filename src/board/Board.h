@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Icon.h"
 #include "Layer.h"
 #include "Tile.h"
 

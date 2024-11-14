@@ -48,3 +48,5 @@ private:
 	std::map<long, DifficultyTab> m_scores;
 	std::string m_name;
 };
+
+bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs);
