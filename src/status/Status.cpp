@@ -1,18 +1,19 @@
 #include "Status.h"
 #include "imgui.h"
-#include "imgui_internal.h"
 
 #include <algorithm>
-#include <string>
 #include <sstream>
+#include <string>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 #define SCORE_FILE_NAME "scores.txt"
 #define INDENT_CUSTOM_SIZE 25
-#define MAX_SIZE 30
+#define MAX_WIDTH 50
+#define MAX_HEIGHT 40
 #define MIN_SIZE 9
 #define CUSTOM_DIFFICULTY 3
+#define MAX_NAME_SIZE 32
 #define COLUMN_SIZE(dif) (dif == CUSTOM_DIFFICULTY ? 4 : 2)
 
 Status::Status(std::shared_ptr<Board> &board)
@@ -29,7 +30,7 @@ Status::Status(std::shared_ptr<Board> &board)
 	}
 
 	loadScoreFile();
-	m_name.resize(32);
+	m_name.resize(MAX_NAME_SIZE);
 }
 
 void Status::render()
@@ -47,7 +48,7 @@ void Status::render()
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
 
-	ImGui::InputText("Player name", m_name.data(), 32);
+	ImGui::InputText("Player name", m_name.data(), MAX_NAME_SIZE);
 
 	ImGui::Text("Mines: %d / %d", m_board->numberOfFlags(), m_board->totalNumberOfMines());
 	auto time = m_board->elapsedTime();
@@ -81,11 +82,11 @@ void Status::render()
 
 		ImGui::Indent(INDENT_CUSTOM_SIZE);
 		if (ImGui::InputInt("Width", &m_localWidth))
-			m_localWidth = std::clamp(m_localWidth, MIN_SIZE, MAX_SIZE);
+			m_localWidth = std::clamp(m_localWidth, MIN_SIZE, MAX_WIDTH);
 
 		/* ImGui::SameLine(); */
 		if (ImGui::InputInt("Height", &m_localHeight))
-			m_localHeight = std::clamp(m_localHeight, MIN_SIZE, MAX_SIZE);
+			m_localHeight = std::clamp(m_localHeight, MIN_SIZE, MAX_HEIGHT);
 
 		/* ImGui::SameLine(); */
 		if (ImGui::Button("Apply")) {
