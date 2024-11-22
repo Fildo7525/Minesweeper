@@ -16,6 +16,7 @@ public:
 		Playing,
 		Win,
 		Lose,
+		Waiting,
 	};
 
 	using time = std::chrono::time_point<std::chrono::steady_clock>;
@@ -40,6 +41,7 @@ public:
 	void setupEmptyTiles();
 
 	void on_refreshBoard_activated();
+	void ackGameOver() { m_gameOver = GameOverState::Waiting; }
 
 private:
 

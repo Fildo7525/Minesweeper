@@ -2,6 +2,7 @@
 #include "imgui.h"
 
 #include <algorithm>
+#include <functional>
 #include <sstream>
 #include <string>
 
@@ -36,14 +37,18 @@ Status::Status(std::shared_ptr<Board> &board)
 void Status::render()
 {
 	if (m_board->isGameOver() == Board::GameOverState::Win) {
+		m_board->ackGameOver();
 		m_score.score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
 		m_score.name = m_name;
-		m_score.difficulty = m_difficulty;
 		m_score.width = m_localWidth;
 		m_score.height = m_localHeight;
 		m_score.numberOfMines = m_numberOfMines;
 
-		m_scores[m_difficulty].insert({m_score.score, m_score});
+		auto now = std::chrono::system_clock::now();
+		auto time = now.time_since_epoch().count();
+		m_score.hash = std::hash<std::string>()(m_name) ^ std::hash<long>()(time) ^ std::hash<long>()(m_score.score);
+
+		m_scores[m_difficulty].push(m_score);
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
@@ -158,13 +163,13 @@ Status::~Status()
 		m_scoreFile << score.first << '\n';
 		for (auto &record : score.second) {
 			// printing score and name
-			m_scoreFile << record.first << " " << record.second.name;
+			m_scoreFile << record.score << " " << record.name << " " << record.hash;
 
 			if (score.first == CUSTOM_DIFFICULTY) {
 				// printing width and height
-				m_scoreFile << " " << record.second.width << " " << record.second.height;
+				m_scoreFile << " " << record.width << " " << record.height;
 				// printing number of mines
-				m_scoreFile << " " << record.second.numberOfMines;
+				m_scoreFile << " " << record.numberOfMines;
 			}
 
 			m_scoreFile << '\n';
@@ -220,7 +225,7 @@ void Status::createTabTable(int difficulty)
 	for (auto &diffGrade : m_scores[difficulty]) {
 		ImGui::TableNextRow();
 
-		if (m_score == diffGrade.second) {
+		if (m_score == diffGrade) {
 			ImGui::PushStyleColor(ImGuiCol_Text, RED_COLOR);
 		}
 		else {
@@ -231,16 +236,16 @@ void Status::createTabTable(int difficulty)
 			ImGui::TableSetColumnIndex(column);
 			switch (column) {
 			case 0:
-				ImGui::Text("%s", diffGrade.second.name.c_str());
+				ImGui::Text("%s", diffGrade.name.c_str());
 				break;
 			case 1:
-				ImGui::Text("%ld", diffGrade.first);
+				ImGui::Text("%ld", diffGrade.score);
 				break;
 			case 2:
-				ImGui::Text("%dx%d", diffGrade.second.width, diffGrade.second.height);
+				ImGui::Text("%dx%d", diffGrade.width, diffGrade.height);
 				break;
 			case 3:
-				ImGui::Text("%d", diffGrade.second.numberOfMines);
+				ImGui::Text("%d", diffGrade.numberOfMines);
 				break;
 			}
 		}
@@ -265,7 +270,6 @@ std::vector<std::string> Status::split(const std::string &s, char delim)
 
 void Status::loadScoreFile()
 {
-	int score;
 	std::string line;
 	int difficulty = 0;
 
@@ -277,22 +281,33 @@ void Status::loadScoreFile()
 			continue;
 		}
 
-		score = std::stoi(parts[0]);
 		ScoreRecord record {
-			.score = score,
-			.name = parts[1],
+			.score = std::stoi(parts[0]),
+			.name = std::move(parts[1]),
+			.hash = std::stoul(parts[2]),
 		};
+
 		if (difficulty == CUSTOM_DIFFICULTY) {
-			record.width = std::stoi(parts[2]);
-			record.height = std::stoi(parts[3]);
-			record.numberOfMines = std::stoi(parts[4]);
+			record.width = std::stoi(parts[3]);
+			record.height = std::stoi(parts[4]);
+			record.numberOfMines = std::stoi(parts[5]);
 		}
 
-		m_scores[difficulty].insert({score, record});
+		m_scores[difficulty].push(record);
 	}
 }
 
 bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs)
 {
-	return lhs.score == rhs.score && lhs.difficulty == rhs.difficulty && lhs.name == rhs.name;
+	return lhs.hash == rhs.hash;
+}
+
+bool operator>(const ScoreRecord &lhs, const ScoreRecord &rhs)
+{
+	return lhs.score > rhs.score;
+}
+
+bool operator<(const ScoreRecord &lhs, const ScoreRecord &rhs)
+{
+	return lhs.score < rhs.score;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <execution>
 #include <vector>
 #include <functional>
 
@@ -16,15 +17,19 @@ public:
 
 	~PQueue() = default;
 
-	PQueue &setSorter(std::function<bool(const T &, const T &)> sorter)
+	PQueue &setSorter(std::function<bool(const T &, const T &)> sorter, bool invoke = true)
 	{
 		m_sorter = sorter;
+
+		if (invoke)
+			sort();
+
 		return *this;
 	}
 
 	void sort()
 	{
-		std::sort(this->begin(), this->end(), m_sorter);
+		std::sort(std::execution::par_unseq, this->begin(), this->end(), m_sorter);
 	}
 
 	void push(const T &value)

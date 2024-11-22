@@ -2,22 +2,22 @@
 
 #include "Board.h"
 
+#include "records/PQueue.h"
+
+#include <cstddef>
 #include <fstream>
 #include <map>
 
 struct ScoreRecord {
-	long difficulty;
 	long score;
 	std::string name;
 	int width;
 	int height;
 	int numberOfMines;
+	size_t hash;
 };
 
-// TODO: Use priority queue sorted by ScoreRecord.score instead of map.
-// This will result into more versatile solution that can be used
-// for different sorting orders.
-using DifficultyTab = std::map<long, ScoreRecord, std::greater<long>>;
+using DifficultyTab = PQueue<ScoreRecord>;
 
 class Status
 	: public Layer
@@ -26,7 +26,6 @@ public:
 	explicit Status(std::shared_ptr<Board> &board);
 	void render() override;
 	int difficulty() const { return m_difficulty; }
-	void setNewScore(int score, const std::string &name);
 
 	~Status();
 
@@ -50,3 +49,5 @@ private:
 };
 
 bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs);
+bool operator>(const ScoreRecord &lhs, const ScoreRecord &rhs);
+bool operator<(const ScoreRecord &lhs, const ScoreRecord &rhs);
