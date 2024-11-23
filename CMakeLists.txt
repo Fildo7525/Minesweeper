@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
 # Dear ImGui
-set(IMGUI_DIR ../imgui)
+set(IMGUI_DIR ./imgui)
 include_directories(${IMGUI_DIR} ${IMGUI_DIR}/backends ..)
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
@@ -23,7 +23,7 @@ set(IM_GUI_FILES
 	${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 	${IMGUI_DIR}/imgui.cpp
 	${IMGUI_DIR}/imgui_draw.cpp
-	${IMGUI_DIR}/imgui_demo.cpp
+	# ${IMGUI_DIR}/imgui_demo.cpp
 	${IMGUI_DIR}/imgui_tables.cpp
 	${IMGUI_DIR}/imgui_widgets.cpp
 )
