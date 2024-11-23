@@ -46,6 +46,7 @@ Application &Application::addLayer(const std::shared_ptr<Layer> &layer)
 	assert(m_layers.find(layer->getName()) == m_layers.end());
 
 	m_layers.insert({layer->getName() ,layer});
+	layer->setApp(shared_from_this());
 	layer->onAttach();
 	return *this;
 }

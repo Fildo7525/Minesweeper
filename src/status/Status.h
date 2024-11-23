@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Board.h"
-
 #include "records/PQueue.h"
 
 #include <cstddef>
@@ -23,7 +21,6 @@ class Status
 	: public Layer
 {
 public:
-	explicit Status(std::shared_ptr<Board> &board);
 	enum SortOrder {
 		Score,
 		Alphabetically,
@@ -32,8 +29,13 @@ public:
 		Max,
 	};
 
+	explicit Status();
 	void render() override;
 	int difficulty() const { return m_difficulty; }
+
+	void onAttach() override;
+
+	void setSortingOrder(SortOrder order);
 
 	~Status();
 
@@ -44,7 +46,6 @@ private:
 	void loadScoreFile();
 
 private:
-	std::shared_ptr<Board> m_board;
 	int m_difficulty;
 	int m_numberOfMines;
 	ScoreRecord m_score;

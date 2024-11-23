@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
 	std::shared_ptr<Board> board(new Board(10, 10, 20));
 	app->addLayer(board);
-	app->addLayer(std::make_shared<Status>(board));
+	app->addLayer(std::make_shared<Status>());
 
 	app->run();
 	return 0;

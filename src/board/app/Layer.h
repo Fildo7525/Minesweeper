@@ -1,7 +1,11 @@
 #pragma once
 
 #include <string>
+#include <memory>
+
 #include "imgui.h"
+
+class Application;
 
 class Layer
 {
@@ -27,7 +31,16 @@ public:
 
 	virtual void render() {}
 
+	void setApp(const std::shared_ptr<Application> &app) { m_app = app; }
+
 protected:
 	ImGuiWindowFlags m_windowFlags;
+
+	// Name of the layer is used for identification in the LayerStack.
 	std::string m_name;
+
+	// This needs to be a weak_ptr to avoid circular references
+	// and to ensure that the Application object is destroyed
+	// and subsequently all its layers
+	std::weak_ptr<Application> m_app;
 };

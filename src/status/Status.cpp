@@ -1,10 +1,10 @@
+#include "Application.h"
+#include "Board.h"
 #include "Status.h"
 #include "imgui.h"
 
-#include <algorithm>
-#include <functional>
+#include <execution>
 #include <sstream>
-#include <string>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -17,11 +17,10 @@
 #define MAX_NAME_SIZE 32
 #define COLUMN_SIZE(dif) (dif == CUSTOM_DIFFICULTY ? 4 : 2)
 
-Status::Status(std::shared_ptr<Board> &board)
+Status::Status()
 	: Layer("Status")
-	, m_board(board)
 	, m_difficulty(0)
-	, m_numberOfMines(board->totalNumberOfMines())
+	, m_numberOfMines()
 	, m_scoreFile(SCORE_FILE_NAME, std::ios::in)
 	, m_scores()
 	, m_name("User")
@@ -37,9 +36,14 @@ Status::Status(std::shared_ptr<Board> &board)
 
 void Status::render()
 {
-	if (m_board->isGameOver() == Board::GameOverState::Win) {
-		m_board->ackGameOver();
-		m_score.score = 100 * (m_board->totalNumberOfCells() * m_numberOfMines) / m_board->numberOfClicks() / m_board->elapsedTime();
+	auto board = m_app.lock()->getLayer<Board>("Board");
+	if (board == nullptr) {
+		throw std::runtime_error("Could not find board layer");
+	}
+
+	if (board->isGameOver() == Board::GameOverState::Win) {
+		board->ackGameOver();
+		m_score.score = 100 * (board->totalNumberOfCells() * m_numberOfMines) / board->numberOfClicks() / board->elapsedTime();
 		m_score.name = m_name;
 		m_score.width = m_localWidth;
 		m_score.height = m_localHeight;
@@ -79,8 +83,8 @@ void Status::render()
 
 	ImGui::InputText("Player name", m_name.data(), MAX_NAME_SIZE);
 
-	ImGui::Text("Mines: %d / %d", m_board->numberOfFlags(), m_board->totalNumberOfMines());
-	auto time = m_board->elapsedTime();
+	ImGui::Text("Mines: %d / %d", board->numberOfFlags(), board->totalNumberOfMines());
+	auto time = board->elapsedTime();
 	if (time == -1) {
 		ImGui::Text("Elapsed time: 0:0");
 	}
@@ -94,15 +98,15 @@ void Status::render()
 			continue;
 		}
 
-		m_numberOfMines = m_board->totalNumberOfMines();
+		m_numberOfMines = board->totalNumberOfMines();
 
 		if (m_difficulty != CUSTOM_DIFFICULTY) {
-			m_board->setDifficulty(i);
+			board->setDifficulty(i);
 		}
 		else {
-			m_board->setOnlyDifficulty(i);
-			m_localHeight = m_board->height();
-			m_localWidth = m_board->width();
+			board->setOnlyDifficulty(i);
+			m_localHeight = board->height();
+			m_localWidth = board->width();
 		}
 	}
 	if (m_difficulty == 3) {
@@ -121,13 +125,13 @@ void Status::render()
 		if (ImGui::Button("Apply")) {
 
 			// Limit the width and height
-			m_board->width() = m_localWidth;
-			m_board->height() = m_localHeight;
+			board->width() = m_localWidth;
+			board->height() = m_localHeight;
 
-			m_board->setupEmptyTiles();
+			board->setupEmptyTiles();
 			m_numberOfMines = (m_localWidth * m_localHeight) / 5;
-			m_board->setNumberOfMines(m_numberOfMines);
-			m_board->resetTimer();
+			board->setNumberOfMines(m_numberOfMines);
+			board->resetTimer();
 		}
 		ImGui::Unindent(INDENT_CUSTOM_SIZE);
 
@@ -136,9 +140,9 @@ void Status::render()
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
 	if (ImGui::InputInt("Mines", &m_numberOfMines)) {
-		m_numberOfMines = std::clamp(m_numberOfMines, 5, m_board->totalNumberOfCells()-9);
-		m_board->setNumberOfMines(m_numberOfMines);
-		m_board->resetTimer();
+		m_numberOfMines = std::clamp(m_numberOfMines, 5, board->totalNumberOfCells()-9);
+		board->setNumberOfMines(m_numberOfMines);
+		board->resetTimer();
 	}
 	ImGui::PopItemWidth();
 
@@ -169,12 +173,18 @@ void Status::render()
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.01f, 1, 0.5f));
 
 	if (ImGui::Button("Play again", ImVec2(ImGui::GetWindowWidth(), 0))) {
-		m_board->on_refreshBoard_activated();
+		board->on_refreshBoard_activated();
 	}
 
 	ImGui::PopStyleColor(3);
 
 	ImGui::End();
+}
+
+void Status::onAttach()
+{
+	auto board = m_app.lock()->getLayer<Board>("Board");
+	m_numberOfMines = board->totalNumberOfMines();
 }
 
 void Status::setSortingOrder(SortOrder order)
