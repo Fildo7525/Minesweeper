@@ -371,7 +371,7 @@ void Status::loadScoreFile()
 	}
 
 	std::getline(m_scoreFile, line);
-	setSortingOrder(static_cast<SortOrder>(std::stoi(line)));
+	auto order = static_cast<SortOrder>(std::stoi(line));
 
 	while (std::getline(m_scoreFile, line)) {
 		auto parts = split(line, ' ');
@@ -395,6 +395,8 @@ void Status::loadScoreFile()
 
 		m_scores[difficulty].push(record);
 	}
+
+	setSortingOrder(order);
 }
 
 bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs)
