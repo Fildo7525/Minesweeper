@@ -52,16 +52,20 @@ void Board::render()
 		throw std::runtime_error("Could not create board window");
 	}
 
-	int buttonWidth = (ImGui::GetWindowSize().x - 80) / (m_width + 1);
-	int buttonHeight = (ImGui::GetWindowSize().y - 100) / (m_height + 1);
+	int buttonWidth = (ImGui::GetWindowSize().x - 80) / m_width;
+	int buttonHeight = (ImGui::GetWindowSize().y - 100) / m_height;
 	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
 
 	auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight;
 
+	ImGuiStyle &style = ImGui::GetStyle();
+	style.ItemSpacing = ImVec2(1, 1);
+	style.FrameRounding = 2.0f;
+
 	for (int y = 0; y < m_height; y++) {
 		for (int x = 0; x < m_width; x++) {
 			if (x > 0) {
-				ImGui::SameLine(x*(buttonSize + 4) + 8);
+				ImGui::SameLine();
 			}
 			int id = y * m_tiles.front().size() + x;
 			ImGui::PushID(id);
