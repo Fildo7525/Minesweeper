@@ -31,6 +31,8 @@ public:
 
 	virtual void render() {}
 
+	Application &app() { return *m_app.lock(); }
+
 	void setApp(const std::shared_ptr<Application> &app) { m_app = app; }
 
 protected:

@@ -47,7 +47,7 @@ Status::Status()
 
 void Status::render()
 {
-	auto board = m_app.lock()->getLayer<Board>("Board");
+	auto board = app().getLayer<Board>("Board");
 	if (board == nullptr) {
 		throw std::runtime_error("Could not find board layer");
 	}
@@ -194,7 +194,7 @@ void Status::render()
 
 void Status::onAttach()
 {
-	auto board = m_app.lock()->getLayer<Board>("Board");
+	auto board = app().getLayer<Board>("Board");
 	m_numberOfMines = board->totalNumberOfMines();
 }
 
