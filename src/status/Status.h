@@ -27,7 +27,6 @@ public:
 		Alphabetically,
 		NumberOfMines,
 		BoardSize,
-		Max,
 	};
 
 	explicit Status();
