@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
 		"../font/BitstromWeraNerdFontMono-Regular.ttf"
 	});
 
-	std::shared_ptr<Board> board(new Board(10, 10, 20));
-	app->addLayer(board);
+	app->addLayer(std::make_shared<Board>(10, 10, 20));
 	app->addLayer(std::make_shared<Status>());
 
 	app->run();
