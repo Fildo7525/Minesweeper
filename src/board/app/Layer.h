@@ -27,7 +27,7 @@ public:
 	virtual void onAttach() {}
 	virtual void onDetach() {}
 
-	std::string getName() const { return m_name; }
+	std::string name() const { return m_name; }
 
 	virtual void render() {}
 
