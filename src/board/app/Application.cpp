@@ -5,6 +5,7 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <cassert>
 #include <stdio.h>
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -42,13 +43,19 @@ Application::~Application()
 
 Application &Application::addLayer(const std::shared_ptr<Layer> &layer)
 {
-	m_layers.emplace_back(layer);
+	assert(m_layers.find(layer->getName()) == m_layers.end());
+
+	m_layers.insert({layer->getName() ,layer});
 	layer->onAttach();
 	return *this;
 }
 
 Application &Application::setWindowSize(int width, int height)
 {
+	assert(m_window != nullptr);
+	assert(width > 0);
+	assert(height > 0);
+
 	m_config.height = height;
 	m_config.width = width;
 	glfwSetWindowSize(m_window, width, height);
@@ -93,7 +100,7 @@ void Application::run()
 		}
 
 		for(auto &layer : m_layers) {
-			layer->render();
+			layer.second->render();
 		}
 
 		// Rendering

@@ -6,9 +6,11 @@
 
 #include <cassert>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 class Application
+	: public std::enable_shared_from_this<Application>
 {
 public:
 	struct Config
@@ -61,17 +63,18 @@ private:
 	ImVec4 m_clearColor;
 
 	/// All the windows displayed in the application.
-	std::vector<std::shared_ptr<Layer>> m_layers;
+	/// The key is the name of the layer.
+	std::unordered_map<std::string, std::shared_ptr<Layer>> m_layers;
 };
 
 template <typename T>
 std::shared_ptr<T> Application::getLayer(const std::string &name)
 {
-	static_assert(std::is_base_of<Layer, T>::value == true);
+	static_assert(std::is_base_of<Layer, T>::value == true, "T must derive from Layer");
 
 	for (auto &layer : m_layers) {
-		if (layer->getName() == name) {
-			return std::static_pointer_cast<T>(layer);
+		if (layer.first == name) {
+			return std::static_pointer_cast<T>(layer.second);
 		}
 	}
 
