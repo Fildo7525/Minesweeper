@@ -4,7 +4,8 @@
 #include "imgui.h"
 
 #include <execution>
-#include <sstream>
+#include <filesystem>
+#include <iostream>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -27,7 +28,17 @@ Status::Status()
 	, m_sortOrder(SortOrder::Score)
 {
 	if (!m_scoreFile.is_open()) {
+		std::cout << "Creating new score file" << std::endl;
 		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
+		m_scoreFile << (int)m_sortOrder << '\n' << "0\n1\n2\n3" << std::endl;
+		m_scoreFile.close();
+	}
+
+	if (std::filesystem::is_empty(SCORE_FILE_NAME)) {
+		m_scoreFile.close();
+		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
+		m_scoreFile << m_sortOrder << "\n0\n1\n2\n3" << std::endl;
+		m_scoreFile.close();
 	}
 
 	loadScoreFile();
@@ -354,6 +365,10 @@ void Status::loadScoreFile()
 {
 	std::string line;
 	int difficulty = 0;
+
+	if (!m_scoreFile.is_open()) {
+		m_scoreFile.open(SCORE_FILE_NAME, std::ios::in);
+	}
 
 	std::getline(m_scoreFile, line);
 	setSortingOrder(static_cast<SortOrder>(std::stoi(line)));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "records/PQueue.h"
+#include "Layer.h"
 
 #include <cstddef>
 #include <fstream>
