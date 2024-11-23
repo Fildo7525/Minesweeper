@@ -24,6 +24,14 @@ class Status
 {
 public:
 	explicit Status(std::shared_ptr<Board> &board);
+	enum SortOrder {
+		Score,
+		Alphabetically,
+		NumberOfMines,
+		BoardSize,
+		Max,
+	};
+
 	void render() override;
 	int difficulty() const { return m_difficulty; }
 
@@ -40,6 +48,7 @@ private:
 	int m_difficulty;
 	int m_numberOfMines;
 	ScoreRecord m_score;
+	SortOrder m_sortOrder;
 
 	int m_localHeight;
 	int m_localWidth;

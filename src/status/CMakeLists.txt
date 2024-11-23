@@ -11,5 +11,6 @@ target_link_libraries(
 	${libname}
 PUBLIC
 	board
+	tbb
 )
 

@@ -25,6 +25,7 @@ Status::Status(std::shared_ptr<Board> &board)
 	, m_scoreFile(SCORE_FILE_NAME, std::ios::in)
 	, m_scores()
 	, m_name("User")
+	, m_sortOrder(SortOrder::Score)
 {
 	if (!m_scoreFile.is_open()) {
 		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
@@ -52,6 +53,29 @@ void Status::render()
 	}
 
 	ImGui::Begin("Game Status", NULL, m_windowFlags);
+
+	if (!ImGui::BeginMainMenuBar()) {
+		throw std::runtime_error("Could not create main menu bar");
+	}
+
+	if (ImGui::BeginMenu("Sort leaderboard")) {
+
+		if (ImGui::MenuItem("Score", "", m_sortOrder == Status::SortOrder::Score)) {
+			setSortingOrder(Status::SortOrder::Score);
+		}
+		if (ImGui::MenuItem("Alphabetically", "", m_sortOrder == Status::SortOrder::Alphabetically)) {
+			setSortingOrder(Status::SortOrder::Alphabetically);
+		}
+		if (ImGui::MenuItem("Number of mines", "", m_sortOrder == Status::SortOrder::NumberOfMines)) {
+			setSortingOrder(Status::SortOrder::NumberOfMines);
+		}
+		if (ImGui::MenuItem("Board size", "", m_sortOrder == Status::SortOrder::BoardSize)) {
+			setSortingOrder(Status::SortOrder::BoardSize);
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::EndMainMenuBar();
 
 	ImGui::InputText("Player name", m_name.data(), MAX_NAME_SIZE);
 
@@ -153,10 +177,58 @@ void Status::render()
 	ImGui::End();
 }
 
+void Status::setSortingOrder(SortOrder order)
+{
+	m_sortOrder = order;
+	std::function<bool(const ScoreRecord &, const ScoreRecord &)> compare;
+
+	switch (m_sortOrder) {
+		case SortOrder::Score:
+			compare = std::greater<ScoreRecord>();
+			break;
+		case SortOrder::Alphabetically:
+			compare = [](const ScoreRecord &lhs, const ScoreRecord &rhs) {
+				if (lhs.name == rhs.name) {
+					return lhs.score > rhs.score;
+				}
+
+				return lhs.name < rhs.name;
+			};
+			break;
+		case SortOrder::NumberOfMines:
+			compare = [](const ScoreRecord &lhs, const ScoreRecord &rhs) {
+				if (lhs.numberOfMines == rhs.numberOfMines) {
+					return lhs.score > rhs.score;
+				}
+
+				return lhs.numberOfMines > rhs.numberOfMines;
+			};
+			break;
+		case SortOrder::BoardSize:
+			compare = [](const ScoreRecord &lhs, const ScoreRecord &rhs) {
+				if (lhs.width == rhs.width && lhs.height == rhs.height) {
+					return lhs.score > rhs.score;
+				}
+
+				return lhs.width*lhs.height > rhs.width*rhs.height;
+			};
+			break;
+		default:
+			compare = std::greater<ScoreRecord>();
+			break;
+	}
+
+	std::for_each(std::execution::par_unseq, m_scores.begin(), m_scores.end(), [compare](auto &score) {
+		score.second.setSorter(compare);
+	});
+}
+
 Status::~Status()
 {
 	m_scoreFile.close();
 	m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
+
+	m_scoreFile << (int)m_sortOrder << '\n';
 
 	for (auto &score : m_scores) {
 		// Printing difficulty
@@ -272,6 +344,9 @@ void Status::loadScoreFile()
 {
 	std::string line;
 	int difficulty = 0;
+
+	std::getline(m_scoreFile, line);
+	setSortingOrder(static_cast<SortOrder>(std::stoi(line)));
 
 	while (std::getline(m_scoreFile, line)) {
 		auto parts = split(line, ' ');
