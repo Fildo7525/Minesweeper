@@ -54,7 +54,7 @@ void Status::render()
 
 	if (board->isGameOver() == Board::GameOverState::Win) {
 		board->ackGameOver();
-		m_score.score = 100 * (board->totalNumberOfCells() * m_numberOfMines) / board->numberOfClicks() / board->elapsedTime();
+		m_score.score = (board->totalNumberOfCells() * m_numberOfMines - board->elapsedTime()) / board->numberOfClicks();
 		m_score.name = m_name;
 		m_score.width = m_localWidth;
 		m_score.height = m_localHeight;
