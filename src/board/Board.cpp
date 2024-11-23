@@ -48,8 +48,10 @@ void Board::render()
 		});
 	}
 
+	if (not ImGui::Begin("Board", NULL, m_windowFlags)) {
+		throw std::runtime_error("Could not create board window");
+	}
 
-	ImGui::Begin("Board", NULL, m_windowFlags);
 	int buttonWidth = (ImGui::GetWindowSize().x - 80) / (m_width + 1);
 	int buttonHeight = (ImGui::GetWindowSize().y - 100) / (m_height + 1);
 	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
