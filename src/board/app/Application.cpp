@@ -182,6 +182,8 @@ void Application::Init()
 		glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, GLFW_FALSE);
 	}
 
+	glfwSetWindowSizeLimits(m_window, m_config.width, m_config.height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
