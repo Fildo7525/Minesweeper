@@ -52,8 +52,9 @@ void Board::render()
 		throw std::runtime_error("Could not create board window");
 	}
 
-	int buttonWidth = (ImGui::GetWindowSize().x - 80) / m_width;
-	int buttonHeight = (ImGui::GetWindowSize().y - 100) / m_height;
+	auto size = ImGui::GetWindowSize();
+	int buttonWidth = size.x / (m_width + 1);
+	int buttonHeight = size.y / (m_height + 1);
 	int buttonSize = buttonWidth < buttonHeight ? buttonWidth : buttonHeight;
 
 	auto buttonFlags = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight;
@@ -90,6 +91,7 @@ Board &Board::setNumberOfMines(int size)
 	m_numberOfFlags = 0;
 	m_gameOver = GameOverState::Playing;
 	m_initialized = false;
+
 	for (auto &row : m_tiles) {
 		for (auto &tile : row) {
 			tile.click(false);
@@ -117,6 +119,7 @@ void Board::setDifficulty(int difficulty)
 	m_difficulty = difficulty;
 	m_height = sizeFromDifficulty();
 	m_width = m_height;
+
 	setupEmptyTiles();
 	setNumberOfMines((m_height*m_width) / 5);
 	resetTimer();
@@ -141,6 +144,7 @@ void Board::on_refreshBoard_activated()
 	m_initialized = false;
 	m_numberOfClicks = 0;
 	m_numberOfFlags = 0;
+
 	resetTimer();
 
 	std::for_each(std::execution::par_unseq, m_tiles.begin(),  m_tiles.end(), [](auto &row) {
@@ -157,14 +161,19 @@ void Board::initTiles(int X, int Y)
 
 	m_tiles.clear();
 	m_tiles.resize(m_height);
+
 	for (int y = 0; y < m_height; y++) {
 		std::vector<Tile> row;
+		row.reserve(m_width);
+
 		for (int x = 0; x < m_width; x++) {
 			auto ocupant = (Icon::Ocupant)countSurroundingMines(x, y);
 			row.emplace_back(Tile(ocupant, {x, y}));
 		}
+
 		m_tiles[y] = row;
 	}
+
 	m_initialized = true;
 }
 
