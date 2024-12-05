@@ -54,7 +54,7 @@ void Status::render()
 
 	if (board->isGameOver() == Board::GameOverState::Win) {
 		board->ackGameOver();
-		m_score.score = (board->totalNumberOfCells() * m_numberOfMines - board->elapsedTime()) / board->numberOfClicks();
+		m_score.score = (board->totalNumberOfTiles() * m_numberOfMines - board->elapsedTime()) / board->numberOfClicks();
 		m_score.name = m_name;
 		m_score.width = m_localWidth;
 		m_score.height = m_localHeight;
@@ -151,7 +151,7 @@ void Status::render()
 
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
 	if (ImGui::InputInt("Mines", &m_numberOfMines)) {
-		m_numberOfMines = std::clamp(m_numberOfMines, 5, board->totalNumberOfCells()-9);
+		m_numberOfMines = std::clamp(m_numberOfMines, 5, board->totalNumberOfTiles()-9);
 		board->setNumberOfMines(m_numberOfMines);
 		board->resetTimer();
 	}
