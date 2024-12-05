@@ -115,7 +115,7 @@ void Status::render()
 			board->setDifficulty(i);
 		}
 		else {
-			board->setOnlyDifficulty(i);
+			board->setDifficulty(i, /*reconfigure*/ false);
 			m_localHeight = board->height();
 			m_localWidth = board->width();
 		}

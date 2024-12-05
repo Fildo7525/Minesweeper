@@ -114,9 +114,13 @@ long Board::elapsedTime()
 	return m_lastElapsedTime;
 }
 
-void Board::setDifficulty(int difficulty)
+void Board::setDifficulty(int difficulty, bool reconfigure)
 {
 	m_difficulty = difficulty;
+	if (!reconfigure) {
+		return;
+	}
+
 	m_height = sizeFromDifficulty();
 	m_width = m_height;
 

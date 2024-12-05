@@ -33,8 +33,7 @@ public:
 	void resetTimer() { m_start = nullptr; }
 	const int &difficulty() const { return m_difficulty; }
 	const long &numberOfClicks() const { return m_numberOfClicks; }
-	void setDifficulty(int difficulty);
-	void setOnlyDifficulty(int difficulty) { m_difficulty = difficulty; }
+	void setDifficulty(int difficulty, bool reconfigure = true);
 	int totalNumberOfCells() const { return m_width * m_height; }
 	int &width() { return m_width; }
 	int &height() { return m_height; }
