@@ -16,7 +16,7 @@
 #define MIN_SIZE 9
 #define CUSTOM_DIFFICULTY 3
 #define MAX_NAME_SIZE 32
-#define COLUMN_SIZE(dif) (dif == CUSTOM_DIFFICULTY ? 4 : 2)
+#define COLUMN_SIZE(dif) (dif == CUSTOM_DIFFICULTY ? 4 : 3)
 
 Status::Status()
 	: Layer("Status")
@@ -255,14 +255,12 @@ Status::~Status()
 		// Printing difficulty
 		m_scoreFile << score.first << '\n';
 		for (auto &record : score.second) {
-			// printing score and name
-			m_scoreFile << record.score << " " << record.name << " " << record.hash;
+			// printing score, name, numebr of mines and hash
+			m_scoreFile << record.score << " " << record.name << " " << record.numberOfMines << " " << record.hash;
 
 			if (score.first == CUSTOM_DIFFICULTY) {
 				// printing width and height
 				m_scoreFile << " " << record.width << " " << record.height;
-				// printing number of mines
-				m_scoreFile << " " << record.numberOfMines;
 			}
 
 			m_scoreFile << '\n';
@@ -307,10 +305,10 @@ void Status::createTabTable(int difficulty)
 	ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 	ImGui::TableSetupColumn("User name");
 	ImGui::TableSetupColumn("Score");
+	ImGui::TableSetupColumn("Mines");
 
 	if (difficulty == CUSTOM_DIFFICULTY) {
 		ImGui::TableSetupColumn("Size");
-		ImGui::TableSetupColumn("Mines");
 	}
 
 	ImGui::TableHeadersRow();
@@ -335,10 +333,10 @@ void Status::createTabTable(int difficulty)
 				ImGui::Text("%ld", diffGrade.score);
 				break;
 			case 2:
-				ImGui::Text("%dx%d", diffGrade.width, diffGrade.height);
+				ImGui::Text("%d", diffGrade.numberOfMines);
 				break;
 			case 3:
-				ImGui::Text("%d", diffGrade.numberOfMines);
+				ImGui::Text("%dx%d", diffGrade.width, diffGrade.height);
 				break;
 			}
 		}
@@ -384,13 +382,13 @@ void Status::loadScoreFile()
 		ScoreRecord record {
 			.score = std::stoi(parts[0]),
 			.name = std::move(parts[1]),
-			.hash = std::stoul(parts[2]),
+			.numberOfMines = std::stoi(parts[2]),
+			.hash = std::stoul(parts[3]),
 		};
 
 		if (difficulty == CUSTOM_DIFFICULTY) {
-			record.width = std::stoi(parts[3]);
-			record.height = std::stoi(parts[4]);
-			record.numberOfMines = std::stoi(parts[5]);
+			record.width = std::stoi(parts[4]);
+			record.height = std::stoi(parts[5]);
 		}
 
 		m_scores[difficulty].push(record);

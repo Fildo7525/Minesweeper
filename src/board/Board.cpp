@@ -199,6 +199,7 @@ std::unordered_set<Pose> Board::generateMinePositions(int x, int y)
 		int X = wDis(gen);
 		int Y = hDis(gen);
 
+		// Ensures that the mines will not be generated around the first click.
 		if (isInRange({x, y}, {X, Y}, 1)) {
 			continue;
 		}
