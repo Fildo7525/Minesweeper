@@ -42,7 +42,6 @@ public:
 	Tile &click(bool c = true); //{}
 
 	ImColor color() const;
-	bool selected() const { return m_ocupant != Icon::Ocupant::Empty; }
 	Icon::Ocupant ocupant() const;
 	std::shared_ptr<Icon> icon() const { return m_icons[(int)m_ocupant]; }
 
