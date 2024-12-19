@@ -33,8 +33,7 @@ class Tile
 public:
 	explicit Tile(Icon::Ocupant ocupant, Pose position, bool clicked = false);
 
-	bool belongsToOponent(const Icon::Ocupant &player) const;
-	bool belongsToUs(const Icon::Ocupant &player) const;
+	bool belongsTo(const Icon::Ocupant &ocupant) const;
 
 	Tile &setOcupant(const Icon::Ocupant &ocupant) { m_ocupant = ocupant; return *this; }
 

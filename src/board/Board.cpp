@@ -40,7 +40,7 @@ void Board::render()
 	if (m_gameOver > GameOverState::Playing || !isGamePlayable()) {
 		std::for_each(std::execution::par_unseq, m_tiles.begin(), m_tiles.end(), [&](auto &row) {
 			for (auto &tile : row) {
-				if (tile.belongsToUs(Icon::Ocupant::Flag) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
+				if (tile.belongsTo(Icon::Ocupant::Flag) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
 					tile.setOcupant(Icon::Ocupant::WrongFlag);
 				}
 				tile.click();
@@ -232,7 +232,7 @@ int Board::countSurroundingMines(int x, int y)
 int Board::countSurroundingFlags(int x, int y)
 {
 	int count = 0;
-	if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
+	if (m_tiles[y][x].belongsTo(Icon::Ocupant::Flag)) {
 		return 9;
 	}
 
@@ -241,7 +241,7 @@ int Board::countSurroundingFlags(int x, int y)
 			if (!tileExists(x + j, y + i)) {
 				continue;
 			}
-			if (m_tiles[y + i][x + j].belongsToUs(Icon::Ocupant::Flag)) {
+			if (m_tiles[y + i][x + j].belongsTo(Icon::Ocupant::Flag)) {
 				count++;
 			}
 		}
@@ -339,7 +339,7 @@ void Board::setAllTilesClicked()
 	for(int y = 0; y < m_height; y++) {
 		for(int x = 0; x < m_height; x++) {
 			if (m_minePositions.find({x, y}) == m_minePositions.end()) {
-				if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
+				if (m_tiles[y][x].belongsTo(Icon::Ocupant::Flag)) {
 					unmarkMine(x, y);
 				}
 			}
@@ -383,7 +383,7 @@ int Board::sizeFromDifficulty()
 bool Board::allMinesMarked()
 {
 	for (auto &position : m_minePositions) {
-		if (!m_tiles[position.y][position.x].belongsToUs(Icon::Ocupant::Flag)) {
+		if (!m_tiles[position.y][position.x].belongsTo(Icon::Ocupant::Flag)) {
 			return false;
 		}
 	}
@@ -435,7 +435,7 @@ void Board::handleClickedTile(int buttonSize, int x, int y, int buttonFlags)
 	const std::string localID = std::to_string(y * m_tiles.front().size() + x);
 	if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].icon()->texture(), size, buttonFlags)) {
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-			if (m_tiles[y][x].belongsToUs(Icon::Ocupant::Flag)) {
+			if (m_tiles[y][x].belongsTo(Icon::Ocupant::Flag)) {
 				m_numberOfFlags--;
 				unmarkMine(x, y);
 

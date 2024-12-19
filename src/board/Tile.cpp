@@ -12,14 +12,9 @@ Tile::Tile(Icon::Ocupant ocupant, Pose position, bool clicked)
 {
 }
 
-bool Tile::belongsToOponent(const Icon::Ocupant &player) const
+bool Tile::belongsTo(const Icon::Ocupant &ocupant) const
 {
-	return m_ocupant != player && m_ocupant != Icon::Ocupant::Empty;
-}
-
-bool Tile::belongsToUs(const Icon::Ocupant &player) const
-{
-	return m_ocupant == player;
+	return m_ocupant == ocupant;
 }
 
 Tile& Tile::click(bool c)
