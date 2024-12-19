@@ -27,9 +27,19 @@ namespace std
 	};
 }
 
+/**
+ * @class Tile
+ * @brief Class representing the tiles on the board.
+ *
+ * The tile manages the ownership and the textures.
+ * The textures are dependent on the state of the tile.
+ * Every texture is loaded only once in the IconPool.
+ * The tile can be clicked or unclicked.
+ */
 class Tile
 {
 public:
+	/// Constructor for the Tile class.
 	explicit Tile(Icon::Ocupant ocupant, Pose position, bool clicked = false);
 
 	/**
@@ -87,7 +97,7 @@ public:
 	 *
 	 * @see Icon::Ocupant The enum representation of the tile state.
 	 */
-	std::shared_ptr<Icon> icon() const { return m_icons[(int)m_ocupant]; }
+	std::shared_ptr<Icon> icon() const { return Icons::instance().icon(m_ocupant); }
 
 private:
 
