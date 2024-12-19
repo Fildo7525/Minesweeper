@@ -2,7 +2,18 @@
 
 std::vector<Icon::Ptr> m_icons;
 
-void loadIcons()
+
+Icons::Icons()
+{
+	loadIcons();
+}
+
+Icons::~Icons()
+{
+	m_icons.clear();
+}
+
+void Icons::loadIcons()
 {
 	m_icons = {
 		std::make_shared<Icon>(Icon::Ocupant::Empty, "", 0, 0),
@@ -19,3 +30,15 @@ void loadIcons()
 		std::make_shared<Icon>(Icon::Ocupant::WrongFlag, "../images/mine_wrong_flag.png", 10, 10),
 	};
 }
+
+Icons &Icons::instance()
+{
+	static Icons instance;
+	return instance;
+}
+
+Icon::Ptr Icons::icon(Icon::Ocupant ocupant)
+{
+	return m_icons[static_cast<int>(ocupant)];
+}
+

@@ -24,7 +24,7 @@ Board::Board(int width, int height, int numberOfMines)
 	, m_start(nullptr)
 	, m_difficulty(0)
 {
-	loadIcons();
+	Icons::instance();
 	setupEmptyTiles();
 }
 

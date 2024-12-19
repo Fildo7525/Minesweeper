@@ -4,7 +4,18 @@
 
 #include "Icon.h"
 
-extern std::vector<Icon::Ptr> m_icons;
+class Icons
+{
+	Icons();
+	~Icons();
+	void loadIcons();
 
-void loadIcons();
+public:
+	static Icons &instance();
+
+	Icon::Ptr icon(Icon::Ocupant ocupant);
+
+private:
+	std::vector<Icon::Ptr> m_icons;
+};
 
