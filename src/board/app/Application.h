@@ -42,7 +42,7 @@ public:
 
 	Application &setWindowSize(int width, int height);
 	GLFWwindow* window() const { return m_window; }
-	void run();
+	int run();
 
 private:
 	explicit Application(const Application::Config &config, Application::RenderBackend renderBackend);

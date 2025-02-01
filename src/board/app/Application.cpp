@@ -62,7 +62,7 @@ Application &Application::setWindowSize(int width, int height)
 	return *this;
 }
 
-void Application::run()
+int Application::run()
 {
 	ImGuiIO &io = ImGui::GetIO();
 	// Main loop
@@ -125,6 +125,8 @@ void Application::run()
 
 		glfwSwapBuffers(m_window);
 	}
+
+	return 0;
 }
 
 Application::Application(const Application::Config &config, Application::RenderBackend renderBackend)
