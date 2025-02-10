@@ -29,7 +29,11 @@ public:
 		BoardSize,
 	};
 
-	explicit Status();
+	static std::shared_ptr<Status> create()
+	{
+		return std::make_shared<Status>();
+	}
+
 	void render() override;
 	int difficulty() const { return m_difficulty; }
 
@@ -40,6 +44,7 @@ public:
 	~Status();
 
 private:
+	explicit Status();
 	std::string difficultyString(int difficulty = -1) const;
 	void createTabTable(int difficulty = -1);
 	std::vector<std::string> split(const std::string &s, char delim);

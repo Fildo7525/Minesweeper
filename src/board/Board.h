@@ -30,25 +30,15 @@ public:
 		Waiting,
 	};
 
+	static std::shared_ptr<Board> create(int width, int height, int numberOfMines)
+	{
+		return std::make_shared<Board>(width, height, numberOfMines);
+	}
+
 	/// The type of the time point. Used in tracking the user time taken to solve the puzzle.
 	using time = std::chrono::time_point<std::chrono::steady_clock>;
 	/// The type of the pose. Used in tracking the position of the tiles.
 	using Tiles = std::vector<std::vector<Tile>>;
-
-	/**
-	 * @brief Constructor for the Board class.
-	 *
-	 * The constructor initializes the board with the given width, height and number of mines.
-	 * At the construction all of the textures are loaded to be used throughout the game. The board alocates space for all
-	 * the time and initializes the tiles with no owner.
-	 *
-	 * @param width The number of tiles in the horizontal direction.
-	 * @param height The number of tiles in the vertical direction.
-	 * @param numberOfMines Number of mines to be placed on the board.
-	 *
-	 * @see Icon Class representing the textures used in the game.
-	 */
-	explicit Board(int width, int height, int numberOfMines);
 
 	/// \addgroup Layer
 	/// @{
@@ -126,6 +116,21 @@ public:
 	void on_refreshBoard_activated();
 
 private:
+
+	/**
+	 * @brief Constructor for the Board class.
+	 *
+	 * The constructor initializes the board with the given width, height and number of mines.
+	 * At the construction all of the textures are loaded to be used throughout the game. The board alocates space for all
+	 * the time and initializes the tiles with no owner.
+	 *
+	 * @param width The number of tiles in the horizontal direction.
+	 * @param height The number of tiles in the vertical direction.
+	 * @param numberOfMines Number of mines to be placed on the board.
+	 *
+	 * @see Icon Class representing the textures used in the game.
+	 */
+	explicit Board(int width, int height, int numberOfMines);
 
 	/**
 	 * @brief Initialize the tiles on the board.
