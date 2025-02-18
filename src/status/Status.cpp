@@ -52,7 +52,7 @@ void Status::render()
 		throw std::runtime_error("Could not find board layer");
 	}
 
-	if (board->isGameOver() == Board::GameOverState::Win) {
+	if (board->gameState() == Board::GameState::Win) {
 		board->ackGameOver();
 		m_score.score = (board->totalNumberOfTiles() * m_numberOfMines - board->elapsedTime()) / board->numberOfClicks();
 		m_score.name = m_name;

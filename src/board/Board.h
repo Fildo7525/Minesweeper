@@ -22,13 +22,28 @@ class Board
 {
 public:
 	/// The state of the game.
-	enum class GameOverState
+	enum class GameState
 	{
 		Playing,
 		Win,
 		Lose,
 		Waiting,
 	};
+
+	/**
+	 * @brief Constructor for the Board class.
+	 *
+	 * The constructor initializes the board with the given width, height and number of mines.
+	 * At the construction all of the textures are loaded to be used throughout the game. The board alocates space for all
+	 * the time and initializes the tiles with no owner.
+	 *
+	 * @param width The number of tiles in the horizontal direction.
+	 * @param height The number of tiles in the vertical direction.
+	 * @param numberOfMines Number of mines to be placed on the board.
+	 *
+	 * @see Icon Class representing the textures used in the game.
+	 */
+	explicit Board(int width, int height, int numberOfMines);
 
 	static std::shared_ptr<Board> create(int width, int height, int numberOfMines)
 	{
@@ -60,7 +75,7 @@ public:
 	int numberOfFlags() const { return m_numberOfFlags; }
 
 	/// Get the number of mines left to be marked.
-	GameOverState isGameOver() const { return m_gameOver; }
+	GameState gameState() const { return m_gameState; }
 
 	/// Get the number of elapsed time since the game started.
 	long elapsedTime();
@@ -105,7 +120,7 @@ public:
 	 * This acknowledge ensures that after the game over invocation the result will not be written multiple times to the
 	 * score structure.
 	 */
-	void ackGameOver() { m_gameOver = GameOverState::Waiting; }
+	void ackGameOver() { m_gameState = GameState::Waiting; }
 
 	/**
 	 * @brief Callback method called when the user wants to refresh the board.
@@ -116,21 +131,6 @@ public:
 	void on_refreshBoard_activated();
 
 private:
-
-	/**
-	 * @brief Constructor for the Board class.
-	 *
-	 * The constructor initializes the board with the given width, height and number of mines.
-	 * At the construction all of the textures are loaded to be used throughout the game. The board alocates space for all
-	 * the time and initializes the tiles with no owner.
-	 *
-	 * @param width The number of tiles in the horizontal direction.
-	 * @param height The number of tiles in the vertical direction.
-	 * @param numberOfMines Number of mines to be placed on the board.
-	 *
-	 * @see Icon Class representing the textures used in the game.
-	 */
-	explicit Board(int width, int height, int numberOfMines);
 
 	/**
 	 * @brief Initialize the tiles on the board.
@@ -256,7 +256,7 @@ private:
 	bool m_initialized;
 	std::unordered_set<Pose> m_minePositions;
 	Tiles m_tiles;
-	GameOverState m_gameOver;
+	GameState m_gameState;
 	int m_width;
 	int m_height;
 	int m_numberOfMines;
