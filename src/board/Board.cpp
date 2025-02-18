@@ -434,7 +434,7 @@ void Board::handleClickedTile(int buttonSize, int x, int y, int buttonFlags)
 
 	const std::string localID = std::to_string(y * m_tiles.front().size() + x);
 	if (ImGui::ImageButton(localID.c_str(), (intptr_t)m_tiles[y][x].icon()->texture(), size, buttonFlags)) {
-		if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && gameState() == GameState::Playing) {
 			if (m_tiles[y][x].belongsTo(Icon::Ocupant::Flag)) {
 				m_numberOfFlags--;
 				unmarkMine(x, y);
