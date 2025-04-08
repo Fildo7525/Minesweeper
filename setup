@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+ROOT=$(pwd)
+
+git submodule update --init --recursive
+
+pushd imgui
+git fetch origin
+git checkout 9fdeb41e
+git checkout -b imgui-9fdeb41e
+git am $ROOT/0001-imgui-allow-flags-in-button-usage.patch
+popd

@@ -1,0 +1,83 @@
+From d2dda3bd6e2bbda4058075ca4f86cd254fc05752 Mon Sep 17 00:00:00 2001
+From: Filip Lobpreis <f.lobpreis@gmail.com>
+Date: Tue, 8 Apr 2025 18:42:55 +0200
+Subject: [PATCH] imgui: allow flags in button usage
+
+Signed-off-by: Filip Lobpreis <f.lobpreis@gmail.com>
+---
+ imgui.h           | 4 ++--
+ imgui_demo.cpp    | 2 +-
+ imgui_widgets.cpp | 8 ++++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/imgui.h b/imgui.h
+index 6d5c8c1d8..6e8b1c320 100644
+--- a/imgui.h
++++ b/imgui.h
+@@ -555,7 +555,7 @@ namespace ImGui
+     // Widgets: Main
+     // - Most widgets return true when the value has been changed or when pressed/selected
+     // - You may also use one of the many IsItemXXX functions (e.g. IsItemActive, IsItemHovered, etc.) to query widget state.
+-    IMGUI_API bool          Button(const char* label, const ImVec2& size = ImVec2(0, 0));   // button
++    IMGUI_API bool          Button(const char* label, const ImVec2& size = ImVec2(0, 0), ImGuiButtonFlags flags = 0);   // button
+     IMGUI_API bool          SmallButton(const char* label);                                 // button with (FramePadding.y == 0) to easily embed within text
+     IMGUI_API bool          InvisibleButton(const char* str_id, const ImVec2& size, ImGuiButtonFlags flags = 0); // flexible button behavior without the visuals, frequently useful to build custom behaviors using the public api (along with IsItemActive, IsItemHovered, etc.)
+     IMGUI_API bool          ArrowButton(const char* str_id, ImGuiDir dir);                  // square button with an arrow shape
+@@ -576,7 +576,7 @@ namespace ImGui
+     // - ImageButton() draws a background based on regular Button() color + optionally an inner background if specified.
+     IMGUI_API void          Image(ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1));
+     IMGUI_API void          ImageWithBg(ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
+-    IMGUI_API bool          ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
++    IMGUI_API bool          ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImGuiButtonFlags &flags = 0, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
+ 
+     // Widgets: Combo Box (Dropdown)
+     // - The BeginCombo()/EndCombo() api allows you to manage your contents and selection state however you want it, by creating e.g. Selectable() items.
+diff --git a/imgui_demo.cpp b/imgui_demo.cpp
+index c28e94105..64d3dfb91 100644
+--- a/imgui_demo.cpp
++++ b/imgui_demo.cpp
+@@ -1855,7 +1855,7 @@ static void DemoWindowWidgetsImages()
+             ImVec2 uv1 = ImVec2(32.0f / my_tex_w, 32.0f / my_tex_h);    // UV coordinates for (32,32) in our texture
+             ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+             ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+-            if (ImGui::ImageButton("", my_tex_id, size, uv0, uv1, bg_col, tint_col))
++            if (ImGui::ImageButton("", my_tex_id, size, ImGuiButtonFlags_None, uv0, uv1, bg_col, tint_col))
+                 pressed_count += 1;
+             if (i > 0)
+                 ImGui::PopStyleVar();
+diff --git a/imgui_widgets.cpp b/imgui_widgets.cpp
+index c0645ad78..a46cd5988 100644
+--- a/imgui_widgets.cpp
++++ b/imgui_widgets.cpp
+@@ -762,9 +762,9 @@ bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags
+     return pressed;
+ }
+ 
+-bool ImGui::Button(const char* label, const ImVec2& size_arg)
++bool ImGui::Button(const char* label, const ImVec2& size_arg, ImGuiButtonFlags flags)
+ {
+-    return ButtonEx(label, size_arg, ImGuiButtonFlags_None);
++    return ButtonEx(label, size_arg, flags);
+ }
+ 
+ // Small buttons fits within text without additional vertical spacing.
+@@ -1139,14 +1139,14 @@ bool ImGui::ImageButtonEx(ImGuiID id, ImTextureID user_texture_id, const ImVec2&
+ 
+ // - ImageButton() adds style.FramePadding*2.0f to provided size. This is in order to facilitate fitting an image in a button.
+ // - ImageButton() draws a background based on regular Button() color + optionally an inner background if specified. (#8165) // FIXME: Maybe that's not the best design?
+-bool ImGui::ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& bg_col, const ImVec4& tint_col)
++bool ImGui::ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImGuiButtonFlags &flags, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& bg_col, const ImVec4& tint_col)
+ {
+     ImGuiContext& g = *GImGui;
+     ImGuiWindow* window = g.CurrentWindow;
+     if (window->SkipItems)
+         return false;
+ 
+-    return ImageButtonEx(window->GetID(str_id), user_texture_id, image_size, uv0, uv1, bg_col, tint_col);
++    return ImageButtonEx(window->GetID(str_id), user_texture_id, image_size, uv0, uv1, bg_col, tint_col, flags);
+ }
+ 
+ #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+-- 
+2.43.0
+
