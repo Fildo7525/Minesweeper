@@ -94,8 +94,11 @@ int Application::run()
 
 		if (m_config.enableDocking) {
 			ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-			dockspace_flags |= ImGuiDockNodeFlags_NoResize
-							| ImGuiDockNodeFlags_AutoHideTabBar;
+			dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar
+							| ImGuiDockNodeFlags_NoResize
+							| ImGuiDockNodeFlags_NoUndocking;
+
+			dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode;
 			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), dockspace_flags);
 		}
 
