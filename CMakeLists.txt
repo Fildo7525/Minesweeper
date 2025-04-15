@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # Dear ImGui
 set(IMGUI_DIR ./imgui)
-include_directories(${IMGUI_DIR} ${IMGUI_DIR}/backends ..)
+include_directories(${IMGUI_DIR} ${IMGUI_DIR}/backends)
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(glfw3 3.3 REQUIRED)
