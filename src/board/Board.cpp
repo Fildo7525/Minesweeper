@@ -173,7 +173,7 @@ void Board::initTiles(int X, int Y)
 		row.reserve(m_width);
 
 		for (int x = 0; x < m_width; x++) {
-			auto ocupant = (Icon::Ocupant)countSurroundingMines(x, y);
+			auto ocupant = countSurroundingMines<Icon::Ocupant>(x, y);
 			row.emplace_back(Tile(ocupant, {x, y}));
 		}
 
@@ -211,11 +211,12 @@ std::unordered_set<Pose> Board::generateMinePositions(int x, int y)
 	return minePositions;
 }
 
-int Board::countSurroundingMines(int x, int y)
+template <Countable T>
+T Board::countSurroundingMines(int x, int y)
 {
 	int count = 0;
 	if (m_minePositions.find({x, y}) != m_minePositions.end()) {
-		return 9;
+		return static_cast<T>(9);
 	}
 
 	for (int i = -1; i < 2; i++) {
@@ -228,7 +229,7 @@ int Board::countSurroundingMines(int x, int y)
 			}
 		}
 	}
-	return count;
+	return static_cast<T>(count);
 }
 
 int Board::countSurroundingFlags(int x, int y)
@@ -300,7 +301,7 @@ void Board::clickAllEmptyTiles(int x, int y)
 		return;
 	}
 	m_tiles[y][x].click();
-	if (countSurroundingMines(x, y) != 0) {
+	if (countSurroundingMines<int>(x, y) != 0) {
 		return;
 	}
 	for (int i = -1; i < 2; i++) {
@@ -364,7 +365,7 @@ void Board::unmarkMine(int x, int y)
 		}
 	}
 
-	Icon::Ocupant cnt = (Icon::Ocupant)countSurroundingMines(x, y);
+	const auto cnt = countSurroundingMines<Icon::Ocupant>(x, y);
 	m_tiles[y][x].setOcupant(cnt).click(false);
 }
 

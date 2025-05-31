@@ -7,6 +7,9 @@
 #include <unordered_set>
 #include <vector>
 
+template<typename T>
+concept Countable = std::same_as<T, int> || std::same_as<T, Icon::Ocupant>;
+
 /**
  * @class Board
  * @brief The Board class is a Layer that represents the game board.
@@ -176,9 +179,13 @@ private:
 	 *
 	 * @param x X coordinate of the position.
 	 * @param y Y coordinate of the position.
+	 *
+	 * @template T The type of the return value. Can be @c Icon::Ocupant or @c int.
+	 *
 	 * @return Number of mines in the vicinity of the given position.
 	 */
-	int countSurroundingMines(int x, int y);
+	template <Countable T>
+	T countSurroundingMines(int x, int y);
 
 	/**
 	 * @brief Just like @c countSurroundingMines but counts the number of flags.
