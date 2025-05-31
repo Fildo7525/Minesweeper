@@ -40,7 +40,9 @@ void Board::render()
 	if (m_gameState > GameState::Playing || !isGamePlayable()) {
 		std::for_each(std::execution::par_unseq, m_tiles.begin(), m_tiles.end(), [&](auto &row) {
 			for (auto &tile : row) {
-				if (tile.belongsTo(Icon::Ocupant::Flag) && m_minePositions.find(tile.position()) == m_minePositions.end()) {
+				if (tile.belongsTo(Icon::Ocupant::Flag)
+					&& m_minePositions.find(tile.position()) == m_minePositions.end())
+				{
 					tile.setOcupant(Icon::Ocupant::WrongFlag);
 				}
 				tile.click();
