@@ -2,3 +2,6 @@ build/
 compile
 .cache
 
+doc/latex
+doc/html
+doc/docbook
