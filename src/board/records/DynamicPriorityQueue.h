@@ -8,7 +8,7 @@
 /**
  * @brief Priority queue with dynamic sorting.
  *
- * The PQueue class is a priority queue based on std::vector<T> that sorts the elements
+ * The DynamicPriorityQueue class is a priority queue based on std::vector<T> that sorts the elements
  * in the container using the given sorter. The main difference from std::priority_queue<T>
  * is that this class's sorter can be changed at runtime. The default sorter is std::greater<T>
  * which sorts the elements in descending order.
@@ -16,16 +16,16 @@
  * @tparam T Type of the elements in the container.
  */
 template <typename T>
-class PQueue : public std::vector<T>
+class DynamicPriorityQueue : public std::vector<T>
 {
 public:
-	PQueue() : m_sorter(std::greater<T>()) {}
-	PQueue(const PQueue &other) = default;
-	PQueue(PQueue &&other) = default;
-	PQueue &operator=(const PQueue &other) = default;
-	PQueue &operator=(PQueue &&other) = default;
+	DynamicPriorityQueue() : m_sorter(std::greater<T>()) {}
+	DynamicPriorityQueue(const DynamicPriorityQueue &other) = default;
+	DynamicPriorityQueue(DynamicPriorityQueue &&other) = default;
+	DynamicPriorityQueue &operator=(const DynamicPriorityQueue &other) = default;
+	DynamicPriorityQueue &operator=(DynamicPriorityQueue &&other) = default;
 
-	~PQueue() = default;
+	~DynamicPriorityQueue() = default;
 
 	/**
 	 * @brief Set the dynamic sorter for the priority queue.
@@ -34,7 +34,7 @@ public:
 	 * @param invoke Flag to invoke the sorter immediately after setting it.
 	 * @return PQueue& Reference to the priority queue.
 	 */
-	PQueue &setSorter(std::function<bool(const T &, const T &)> sorter, bool invoke = true)
+	DynamicPriorityQueue &setSorter(std::function<bool(const T &, const T &)> sorter, bool invoke = true)
 	{
 		m_sorter = sorter;
 

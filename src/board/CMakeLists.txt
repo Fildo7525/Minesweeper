@@ -9,7 +9,7 @@ STATIC
 	Board.h
 	Tile.cpp
 	Tile.h
-	records/PQueue.h
+	records/DynamicPriorityQueue.h
 )
 
 target_include_directories(${libname} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

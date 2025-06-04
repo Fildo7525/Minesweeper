@@ -1,6 +1,6 @@
 #pragma once
 
-#include "records/PQueue.h"
+#include "records/DynamicPriorityQueue.h"
 #include "Layer.h"
 
 #include <cstddef>
@@ -16,7 +16,7 @@ struct ScoreRecord {
 	size_t hash;
 };
 
-using DifficultyTab = PQueue<ScoreRecord>;
+using DifficultyTab = DynamicPriorityQueue<ScoreRecord>;
 
 class Status
 	: public Layer
