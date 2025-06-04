@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <fstream>
 #include <map>
+#include <print>
 
 struct ScoreRecord {
 	long score;
@@ -66,3 +67,13 @@ private:
 bool operator==(const ScoreRecord &lhs, const ScoreRecord &rhs);
 bool operator>(const ScoreRecord &lhs, const ScoreRecord &rhs);
 bool operator<(const ScoreRecord &lhs, const ScoreRecord &rhs);
+
+template <>
+struct std::formatter<ScoreRecord> {
+	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+	template <typename FormatContext>
+	auto format(const ScoreRecord& record, FormatContext& ctx) const {
+		return std::format_to(ctx.out(), "{} {} {} {}", record.score, record.name, record.numberOfMines, record.hash);
+	}
+};
