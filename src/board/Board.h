@@ -86,9 +86,6 @@ public:
 	/// Reset the timer to the initial state.
 	void resetTimer() { m_start = nullptr; }
 
-	/// Get the difficulty of the game.
-	const int &difficulty() const { return m_difficulty; }
-
 	/// Get the number of clicks made by the user.
 	const long &numberOfClicks() const { return m_numberOfClicks; }
 
