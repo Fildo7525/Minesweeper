@@ -6,6 +6,7 @@
 #include <execution>
 #include <filesystem>
 #include <iostream>
+#include <print>
 
 #define RED_COLOR ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
 #define DEFAULT_COLOR ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -34,6 +35,7 @@ Status::Status()
 		m_scoreFile.close();
 	}
 
+	std::filesystem::path scoreFilePath(SCORE_FILE_NAME);
 	if (std::filesystem::is_empty(SCORE_FILE_NAME)) {
 		m_scoreFile.close();
 		m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
@@ -249,21 +251,21 @@ Status::~Status()
 	m_scoreFile.close();
 	m_scoreFile.open(SCORE_FILE_NAME, std::ios::out);
 
-	m_scoreFile << (int)m_sortOrder << '\n';
+	std::println(m_scoreFile, "{}", (int)m_sortOrder);
 
 	for (auto &score : m_scores) {
 		// Printing difficulty
 		m_scoreFile << score.first << '\n';
 		for (auto &record : score.second) {
 			// printing score, name, numebr of mines and hash
-			m_scoreFile << record.score << " " << record.name << " " << record.numberOfMines << " " << record.hash;
+			std::print(m_scoreFile, "{} {} {} {}", record.score, record.name, record.numberOfMines, record.hash);
 
 			if (score.first == CUSTOM_DIFFICULTY) {
 				// printing width and height
-				m_scoreFile << " " << record.width << " " << record.height;
+				std::print(m_scoreFile, " {} {}", record.width, record.height);
 			}
 
-			m_scoreFile << '\n';
+			std::print(m_scoreFile, "\n");
 		}
 	}
 
@@ -375,7 +377,7 @@ void Status::loadScoreFile()
 		auto parts = split(line, ' ');
 		if (parts.size() == 1) {
 			difficulty = std::stoi(parts[0]);
-			m_scores[difficulty] = {};
+			m_scores[difficulty].reserve(100);
 			continue;
 		}
 
