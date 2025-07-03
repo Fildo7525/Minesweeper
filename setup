@@ -3,6 +3,7 @@
 ROOT=$(pwd)
 
 git submodule update --init --recursive
+sudo apt install libglfw3-dev libglew-dev libstb-dev
 
 pushd imgui
 git fetch origin
