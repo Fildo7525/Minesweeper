@@ -409,7 +409,6 @@ void Board::handleUnclickedTile(int buttonSize, int x, int y, int buttonFlags)
 				m_numberOfFlags++;
 				markMine(x, y);
 				if (allMinesMarked() && m_numberOfFlags == m_numberOfMines) {
-					m_numberOfFlags++;
 					m_gameState = GameState::Win;
 					setAllTilesClicked();
 				}
