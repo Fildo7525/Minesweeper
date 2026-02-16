@@ -161,7 +161,7 @@ void Status::render()
 
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-		ImGui::BeginChild("ChildR", ImVec2(0, 260), ImGuiChildFlags_Border);
+		ImGui::BeginChild("ChildR", ImVec2(0, 260), ImGuiChildFlags_Borders);
 
 		if (!ImGui::BeginTabBar("MyTabBar"))
 			return;
