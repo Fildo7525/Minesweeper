@@ -1,6 +1,10 @@
-#!/bin/zsh
+#!/usr/bin/env bash
+
+set -e
+
 cd build/
 make -j16
+
 if [ $? -eq 0 ];then
 	clear
 	./Minesweeper

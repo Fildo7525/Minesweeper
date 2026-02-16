@@ -11,3 +11,6 @@ git checkout 9fdeb41e
 git checkout -b imgui-9fdeb41e
 git am $ROOT/0001-imgui-allow-flags-in-button-usage.patch
 popd
+
+cmake -S . -B build
+cp ./imgui.ini ./build/imgui.ini
